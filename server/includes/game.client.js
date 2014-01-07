@@ -21,6 +21,9 @@ var constants = ngc.constants;
 var stager = new Stager();
 var game = {};
 
+//Number Of required players to play the game:
+var nbRequiredPlayers = 2;
+
 module.exports = game;
 
 // GLOBALS
@@ -130,6 +133,7 @@ stager.setOnInit(function() {
     };
 
     node.on.data('results', function(values) {
+        // Load the results page in the iframe, and do the following instructions:
         console.log('Received results.');
         values = values.data;
         node.game.oldContribDemand = values;
@@ -376,6 +380,13 @@ function meritocracy() {
         // Hides Demand if room type is not endo
         document.getElementById('mainframe').contentWindow.document.getElementById('demandBox').style.display = node.game.roomType === 'endo' ? 'block' : 'none';
 
+        // Shows the correct helper text depending on game type
+        if (node.game.roomType === 'blackbox') {
+            document.getElementById('mainframe').contentWindow.document.getElementById('other-game-type').style.display = 'none';
+        } else {
+            document.getElementById('mainframe').contentWindow.document.getElementById('blackbox-game-type').style.display = 'none';
+        }
+
         // Start the timer after an offer was received.
         options = {
             milliseconds: 30000,
@@ -535,7 +546,7 @@ stager.addStage({
     // `minPlayers` triggers the execution of a callback in the case
     // the number of players (including this client) falls the below
     // the chosen threshold. Related: `maxPlayers`, and `exactPlayers`.
-    minPlayers: [2, notEnoughPlayers],
+    minPlayers: [nbRequiredPlayers, notEnoughPlayers],
     syncOnLoaded: true,
     done: clearFrame
 });
@@ -543,7 +554,7 @@ stager.addStage({
 stager.addStage({
     id: 'instructions',
     cb: instructions,
-    minPlayers: [2, notEnoughPlayers],
+    minPlayers: [nbRequiredPlayers, notEnoughPlayers],
     syncOnLoaded: true,
     timer: 600000,
     done: clearFrame
@@ -552,7 +563,7 @@ stager.addStage({
 stager.addStage({
     id: 'quiz',
     cb: quiz,
-    minPlayers: [2, notEnoughPlayers],
+    minPlayers: [nbRequiredPlayers, notEnoughPlayers],
     syncOnLoaded: true,
     // `timer` starts automatically the timer managed by the widget VisualTimer
     // if the widget is loaded. When the time is up it fires the DONE event.
@@ -589,7 +600,7 @@ stager.addStep({
 stager.addStage({
     id: 'meritocracy',
     steps: ['bid', 'results'],
-    minPlayers: [2, notEnoughPlayers],
+    minPlayers: [nbRequiredPlayers, notEnoughPlayers],
     // `syncOnLoaded` forces the clients to wait for all the others to be
     // fully loaded before releasing the control of the screen to the players.
     // This options introduces a little overhead in communications and delay
