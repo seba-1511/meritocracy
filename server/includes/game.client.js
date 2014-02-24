@@ -212,21 +212,21 @@ stager.setOnInit(function() {
     // This function is called to create the bars.
     this.updateResults = function(barsValues) {
         var group, player, i, j, div, subdiv, color, save;
-        var barsValues, barsDiv, showDemand;
+        var barsValues, barsDiv, showDemand, myPayoff;
         var text, groupHeader, groupHeaderText, groupNames;
 
         // Notice: _barsValues_ array:
-        // 0: array: contr, demand
+        // 0: array of array: contr, demand by group
         // 1: array: group, position in group
-        // 2: payoff
+        // 2: array of array: allPayoffs by group
         // 3: array: groups are compatible or not (only endo)
 
         groupNames = ['A', 'B', 'C', 'D'];
 
         showDemand = node.env('roomType') === 'endo';
 
-        console.log(barsValues);
-        console.log(showDemand);
+//        console.log(barsValues);
+//        console.log(showDemand);
 
         barsDiv = W.getElementById('barsResults');
         payoffSpan = W.getElementById('payoff');
@@ -248,20 +248,22 @@ stager.setOnInit(function() {
             groupHeader.innerHTML = groupHeaderText;
             barsDiv.appendChild(div);
             div.appendChild(groupHeader);
+
             for (j = 0; j < group.length; j++) {
 
                 player = group[j];
+                text = ' (' + barsValues[2][i][j] + ')';
 
                 // It is me?
                 if (barsValues[1][0] === i && barsValues[1][1] === j) {
                     color = [undefined, '#9932CC'];
-                    text = 'YOU <-----';
+                    text += ' YOU <-----';
+                    myPayoff = +barsValues[2][i][j];
                 }
                 else {
                     color = ['#DEB887', '#A52A2A'];
-                    text = '';
                 }
-
+                
                 // This is the DIV actually containing the bar
                 subdiv = document.createElement('div');
                 div.appendChild(subdiv);
@@ -272,7 +274,7 @@ stager.setOnInit(function() {
                     text = '';
                     // It is me?
                     if (barsValues[1][0] === i && barsValues[1][1] === j) {
-                        text = 'YOU <-----';
+                        text = ' YOU <-----';
                     }
                     bars.createBar(subdiv, player[1], 20, color[1], text);
                 }
@@ -283,12 +285,12 @@ stager.setOnInit(function() {
             // barsDiv.appendChild(div);
         }
 
-        node.game.oldPayoff = +barsValues[2]; // final payoff
+        node.game.oldPayoff = myPayoff; // final payoff
 
         // How many coins player put in personal account.
         save = node.game.INITIAL_COINS - node.game.oldContrib;
-        payoffSpan.innerHTML = save + ' + ' + (barsValues[2] - save) +
-            ' = ' + node.game.oldPayoff;
+        payoffSpan.innerHTML = save + ' + ' + (myPayoff - save) + 
+            ' = ' + myPayoff;
     };
 
     this.isValidContribution = function(n) {
@@ -422,7 +424,7 @@ function showResults(bars) {
             };
 
             node.env('auto', function() {
-                node.timer.randomEmit('DONE', 6000);
+                // node.timer.randomEmit('DONE', 6000);
             });
         });
     });

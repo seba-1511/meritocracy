@@ -326,10 +326,14 @@ function createNoise(receivedData, variance) {
 /**
  * Send and saves received values for each player.
  */
-function emitPlayersResults(pId, bars, position, payoff, compatibility) {
-    var finalBars;
-    finalBars = [bars, position, payoff, compatibility];
-    node.say('results', pId, finalBars);
+function emitPlayersResults(ranking, bars, allPositions, allPayoffs,
+                            compatibility) {
+    var i, len, finalBars;
+    i = -1, len = ranking.length;
+    for ( ; ++i < len ; ) {
+        finalBars = [bars, allPositions[i], allPayoffs, compatibility];
+        node.say('results', ranking[i], finalBars);
+    }
 }
 
 // Saves the outcome of a round to database, and communicates it to the clients.
@@ -339,6 +343,7 @@ function finalizeRound(currentStage, bars,
 
     var i, len, j, lenJ, contribObj;
     var pId, positionInNoisyRank, playerPayoff;
+    var allPayoffs, allPositions;
     var code;
 
     if (settings.DB === 'MONGODB') {
@@ -349,11 +354,17 @@ function finalizeRound(currentStage, bars,
 
     console.log(noisyGroups.length);
     console.log('!!!!!');
+    
+    allPayoffs = [];
+    allPositions = [];
+
+    debugger
 
     // Save the results for each player, and notify him.
     i = -1, len = noisyGroups.length;
     for (; ++i < len;) {
         j = -1, lenJ = noisyGroups[i].length;
+        allPayoffs.push([]);
         
         console.log(noisyGroups[i].length);
         console.log('======');
@@ -363,9 +374,13 @@ function finalizeRound(currentStage, bars,
 
             // Position in Rank (array of group id, position within group).
             positionInNoisyRank = [i, j];
+            allPositions.push(positionInNoisyRank);
+
             pId = contribObj.player;
             
             playerPayoff = getPayoff(bars, positionInNoisyRank);
+            
+            allPayoffs[i].push(playerPayoff);            
             
             // Updating the player database with the current payoff.
             code = dk.codes.id.get(pId);
@@ -385,10 +400,12 @@ function finalizeRound(currentStage, bars,
                                            currentStage);
             }
 
-            emitPlayersResults(pId, bars, positionInNoisyRank,
-                               playerPayoff, compatibility);
         }
     }
+
+    // Emit all payoffs.
+    emitPlayersResults(ranking, bars, allPositions, allPayoffs,
+                       compatibility);
 }
 
 // // Removes duplicates in case of reconnections.
