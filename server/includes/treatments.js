@@ -26,9 +26,8 @@ var ENDO = treatment === 'endo';
 var treatments = {};
 module.exports = treatments;
 
-// Noise variance. High and low stands for "meritocracy", not for noise.
-var NOISE_HIGH = settings.NOISE_HIGH;
-var NOISE_LOW = settings.NOISE_LOW;
+// High and low stands for "meritocracy", not for noise.
+var NOISE_STD = settings.NOISE_STD[treatment];
 
 var GROUP_ACCOUNT_DIVIDER = settings.GROUP_ACCOUNT_DIVIDER;
 
@@ -310,15 +309,16 @@ function computeGroupStats(groups) {
  * @param  {NDDB} receivedData Received data from client
  * @return {NDDB}              Received data, with noise field
  */
-function createNoise(receivedData, variance) {
-    var contrib, iter;
+function createNoise(receivedData, std) {
+    var contrib, noise;
     var i, len;
     i = -1, len = receivedData.db.length;
+    console.log('STD ', std);
     for (; ++i < len;) {
         contrib = receivedData.db[i].value.contribution;
-        receivedData.db[i].value.noisyContribution = contrib +
-            J.nextNormal(0, variance);
-        console.log(contrib, receivedData.db[i].value.noisyContribution);
+        noise = J.nextNormal(0, std);
+        receivedData.db[i].value.noisyContribution = contrib + noise;
+        console.log(contrib, noise, receivedData.db[i].value.noisyContribution);
     }
     return receivedData;
 }
@@ -357,8 +357,6 @@ function finalizeRound(currentStage, bars,
     
     allPayoffs = [];
     allPositions = [];
-
-    debugger
 
     // Save the results for each player, and notify him.
     i = -1, len = noisyGroups.length;
@@ -404,7 +402,7 @@ function finalizeRound(currentStage, bars,
     }
 
     // Emit all payoffs.
-    emitPlayersResults(ranking, bars, allPositions, allPayoffs,
+    emitPlayersResults(noisyRanking, bars, allPositions, allPayoffs,
                        compatibility);
 }
 
@@ -413,6 +411,61 @@ function finalizeRound(currentStage, bars,
 //    for(var o = {}, i; i=arr.shift(); o[i.player] = i.count + (o[i.player] || 0));
 //    for(i in o) arr.push({name:i, count:o[i]});
 // }
+
+function sendNoisyResults() {
+    var currentStage, previousStage,
+    receivedData,
+    sortedContribs,
+    matching,
+    ranking, groups, groupStats,
+    noisyRanking, noisyGroups, noisyGroupStats,
+    bars;
+
+    currentStage = node.game.getCurrentGameStage();
+    previousStage = node.game.plot.previous(currentStage);
+
+    receivedData = node.game.memory.stage[previousStage]
+        .selexec('key', '=', 'bid');
+
+    sortedContribs = receivedData
+        .sort(sortContributions)
+        .fetch();
+
+    // Original Ranking (without noise).
+    matching = doGroupMatching(sortedContribs);
+
+    // Array of sorted player ids, from top to lowest contribution.
+    ranking = matching.ranking;
+    // Array of array of contributions objects.
+    groups = matching.groups;
+    // Compute average contrib and demand in each group.
+    groupStats = computeGroupStats(groups);
+
+    // Add Noise.
+    receivedData = createNoise(receivedData, NOISE_STD);
+
+    sortedContribs = receivedData
+        .sort(sortNoisyContributions)
+        .fetch();
+
+    matching = doGroupMatching(sortedContribs);
+
+    // Array of sorted player ids, from top to lowest contribution.
+    noisyRanking = matching.ranking;
+    // Array of array of contributions objects.
+    noisyGroups = matching.groups;
+    // Compute average contrib and demand in each group.
+    noisyGroupStats = computeGroupStats(noisyGroups);
+
+    // Bars for display in clients.
+    bars = matching.bars;
+
+    // Save to db, and sends results to players.
+    finalizeRound(currentStage, bars,
+                  groupStats, groups, ranking,
+                  noisyGroupStats, noisyGroups, noisyRanking);
+}
+
 
 // STARTING THE TREATMENTS.
 
@@ -490,126 +543,28 @@ treatments.exo_perfect = {
 
 // EXO HIGH.
 treatments.exo_high = {
-
-    sendResults: function () {
-        var currentStage, previousStage,
-        receivedData,
-        sortedContribs,
-        matching,
-        ranking, groups, groupStats,
-        noisyRanking, noisyGroups, noisyGroupStats,
-        bars;
-
-        currentStage = node.game.getCurrentGameStage();
-        previousStage = node.game.plot.previous(currentStage);
-
-        receivedData = node.game.memory.stage[previousStage]
-            .selexec('key', '=', 'bid');
-
-        sortedContribs = receivedData
-            .sort(sortContributions)
-            .fetch();
-
-        // Original Ranking (without noise).
-        matching = doGroupMatching(sortedContribs);
-
-        // Array of sorted player ids, from top to lowest contribution.
-        ranking = matching.ranking;
-        // Array of array of contributions objects.
-        groups = matching.groups;
-        // Compute average contrib and demand in each group.
-        groupStats = computeGroupStats(groups);
-
-        // Add Noise.
-        receivedData = createNoise(receivedData, NOISE_HIGH);
-
-        sortedContribs = receivedData
-            .sort(sortNoisyContributions)
-            .fetch();
-
-        matching = doGroupMatching(sortedContribs);
-
-        // Array of sorted player ids, from top to lowest contribution.
-        noisyRanking = matching.ranking;
-        // Array of array of contributions objects.
-        noisyGroups = matching.groups;
-        // Compute average contrib and demand in each group.
-        noisyGroupStats = computeGroupStats(noisyGroups);
-
-        // Bars for display in clients.
-        bars = matching.bars;
-
-        // Save to db, and sends results to players.
-        finalizeRound(currentStage, bars,
-                      groupStats, groups, ranking,
-                      noisyGroupStats, noisyGroups, noisyRanking);
-    }
+    sendResults: sendNoisyResults   
 };
 
 // EXO LOW.
 treatments.exo_low = {
-    sendResults: function () {
-        var currentStage, previousStage,
-        receivedData,
-        sortedContribs,
-        matching,
-        ranking, groups, groupStats,
-        noisyRanking, noisyGroups, noisyGroupStats,
-        bars;
+    sendResults: sendNoisyResults
+};
 
-        currentStage = node.game.getCurrentGameStage();
-        previousStage = node.game.plot.previous(currentStage);
 
-        receivedData = node.game.memory.stage[previousStage]
-            .selexec('key', '=', 'bid');
-        
-        if (!receivedData.db.length) {
-            debugger;
-        }
+// EXO LOWLOW.
+treatments.exo_lowlow = {
+    sendResults: sendNoisyResults
+};
 
-        sortedContribs = receivedData
-            .sort(sortContributions)
-            .fetch();
+// EXO EXTRALOW.
+treatments.exo_extralow = {
+    sendResults: sendNoisyResults
+};
 
-        // Original Ranking (without noise).
-        matching = doGroupMatching(sortedContribs);
-
-        // Array of sorted player ids, from top to lowest contribution.
-        ranking = matching.ranking;
-        // Array of array of contributions objects.
-        groups = matching.groups;
-        // Compute average contrib and demand in each group.
-        groupStats = computeGroupStats(groups);
-
-        // Add Noise.
-        receivedData = createNoise(receivedData, NOISE_LOW);
-
-        sortedContribs = receivedData
-            .sort(sortNoisyContributions)
-            .fetch();
-
-        matching = doGroupMatching(sortedContribs);
-
-        // Array of sorted player ids, from top to lowest contribution.
-        noisyRanking = matching.ranking;
-        // Array of array of contributions objects.
-        noisyGroups = matching.groups;
-        // Compute average contrib and demand in each group.
-        noisyGroupStats = computeGroupStats(noisyGroups);
-
-        
-        if (!noisyGroups.length) {
-            debugger;
-        }
-
-        // Bars for display in clients.
-        bars = matching.bars;
-
-        // Save to db, and sends results to players.
-        finalizeRound(currentStage, bars,
-                      groupStats, groups, ranking,
-                      noisyGroupStats, noisyGroups, noisyRanking);
-    }
+// EXO MINOR.
+treatments.exo_minor = {
+    sendResults: sendNoisyResults
 };
 
 // EXO RANDO.

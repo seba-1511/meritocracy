@@ -36,12 +36,20 @@ module.exports = function(node, channel, room) {
         dk.readCodes(codesNotFound);
     }
 
+    // How many sessions should be dispatched.
+    var TARGET_SESSIONS = settings.TARGET_SESSIONS;
+    // Should we accept sessions.
+    var acceptExtraSessions = settings.ACCEPT_EXTRA_SESSIONS;
+
     // If NO authorization is found, local codes will be used,
     // and assigned automatically.
     var noAuthCounter = -1;
 
-    // Used to rotate treatments.
-    var treatmentCounter = -1;
+    // Used to rotate treatments, and count how many have been dispatched.
+    var sessionCounter = 0;
+
+    // Still dispatching.
+    var roomClosed = false;
 
     // Loads the database layer. If you do not use an external database
     // you do not need these lines.
@@ -84,27 +92,42 @@ module.exports = function(node, channel, room) {
         exo_perfect: {
             group: 'exo_perfect',
             logicPath: logicPath,
-        }
+        },
+        exo_lowlow: {
+            group: 'exo_lowlow',
+            logicPath: logicPath,
+        },
+        exo_extralow: {
+            group: 'exo_extralow',
+            logicPath: logicPath,
+        },
+        exo_minor: {
+            group: 'exo_minor',
+            logicPath: logicPath,
+        },
+
     };
 
     // Assigns a treatment condition to a group.
     function decideRoom(treatment) {
-        ++treatmentCounter;
+        ++sessionCounter;
         if ('undefined' === typeof treatment) {            
             treatment = J.randomInt(0,settings.TREATMENTS.length);
             treatment = settings.TREATMENTS[treatment];
         }
         else {
-            if (treatmentCounter === 0) {
-                treatment = 'exo_perfect';
+            if (sessionCounter === 1) {
+                treatment = 'exo_lowlow';
             }
-            else if (treatmentCounter === 1) {
-                treatment = 'exo_high';
+            else if (sessionCounter === 2) {
+                treatment = 'exo_extralow';
+            }
+            else if (sessionCounter === 3) {
+                treatment = 'exo_minor';
             }
             else {
-                treatment = 'exo_low';
+                treatment = 'random';
             }
-            
         }
         // Implement logic here.
         return roomLogics[treatment];
@@ -195,6 +218,7 @@ module.exports = function(node, channel, room) {
         // Return the id only if token was validated.
         // More checks could be done here to ensure that token is unique in ids.
         if (cookies.token && validCookie) {
+            dk.incrementUsage(code);
             return cookies.token;
         }
     });
@@ -285,7 +309,7 @@ module.exports = function(node, channel, room) {
         console.log('********Waiting Room Created*****************');
 
         function connectingPlayer(p) {
-            var nPlayers;
+            var nPlayers, code;
             console.log('-----------Player connected ' + p.id);
 
             
@@ -306,18 +330,37 @@ module.exports = function(node, channel, room) {
             node.say('waitingRoom', 'ALL', {
                 poolSize: POOL_SIZE,
                 nPlayers: nPlayers,
-                atLeastPlayers: COUNTDOWN_AT_POOL_SIZE
+                atLeastPlayers: COUNTDOWN_AT_POOL_SIZE,
+                gameCompleted: roomClosed
             });
 
-            // Wait to have enough clients connected.
-            if (nPlayers < POOL_SIZE) {
-                startCountdown(nPlayers, p.id);
+            if (roomClosed) {
+                // Checkin him / her out.
+                code = dk.codes.id.get(p.id);
+                if (!code) {
+                    console.log('ERROR: no code for connecting player:', p.id);
+                    return;
+                }
+                
+                // Award a compensation only the first time.
+                if (!code.win) {
+                    console.log('CO!!!!!!!!');
+                    accesscode = code.AccessCode;
+                    exitcode = code.ExitCode;                    
+                    code.win =  0.25;
+                    dk.checkOut(accesscode, exitcode, code.win);
+                }
             }
             else {
-                node.emit('DISPATCH');
+                // Wait to have enough clients connected.
+                if (nPlayers < POOL_SIZE) {
+                    startCountdown(nPlayers, p.id);
+                }
+                else {
+                    node.emit('DISPATCH');
+                }
             }
         }
-
 
         // This callback is executed whenever a previously disconnected
         // players reconnects.
@@ -427,22 +470,38 @@ module.exports = function(node, channel, room) {
                 gameRoom.startGame();
             }
 
+            if ('undefined' !== TARGET_SESSIONS) {
+                if (sessionCounter === TARGET_SESSIONS) {
+                    console.log('SESSION TARGET REACHED: ', sessionCounter);
+                    if (!acceptExtraSessions) {
+                        roomClosed = true;
+                    }
+                }                                               
+            }
+            
             // TODO: node.game.pl.size() is unchanged.
             // We need to check with wRoom.size()
-            nPlayers = room.clients.player.size();
-            if (nPlayers) {
-                // If there are some players left out of the matching, notify
-                // them that they have to wait more.
-                wRoom.each(function(p) {
-                    node.say('waitingRoom', p.id, {
-                        poolSize: POOL_SIZE,
-                        nPlayers: nPlayers,
-                        retry: true
-                    });
-                });
+            if (room.clients.player.size()) {                
+                node.emit('NOTIFY_LEFTOVER');
             }
         });
-
+        
+        
+        // If there are some players left out of the matching,
+        // notify them that they have to wait more.
+        node.on('NOTIFY_LEFTOVER', function() {
+            var nPlayers;
+            nPlayers = room.clients.player.size();
+            if (nPlayers) {                
+                node.say('waitingRoom', 'ALL', {
+                    poolSize: POOL_SIZE,
+                    nPlayers: nPlayers,
+                    retry: !roomClosed,
+                    roomClosed: roomClosed
+                });            
+            }
+        });
+        
     });
 
     // This function will be executed once node.game.gameover() is called.

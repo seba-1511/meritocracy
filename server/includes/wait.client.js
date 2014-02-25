@@ -43,6 +43,13 @@ function waiting2start() {
                 'Unfortunately, you have not been selected. Please, keep ' +
                 'waiting, the next batch should start shortly.';
         }
+        else if (data.gameCompleted) {
+            span_msg.innerHTML = 'Unfortunately, the last game just started ' +
+                'and you have not been selected. ' +
+                'We kindly ask you to return the HIT. You are ' +
+                'awarded a compensation of 0.25 USD for your waiting time. ' +
+                'Thank you very much.';
+        }
     }
         
     node.on.data('countdown', function(msg) {

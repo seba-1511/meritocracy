@@ -424,7 +424,7 @@ function showResults(bars) {
             };
 
             node.env('auto', function() {
-                // node.timer.randomEmit('DONE', 6000);
+                node.timer.randomEmit('DONE', 6000);
             });
         });
     });

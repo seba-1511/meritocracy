@@ -56,9 +56,22 @@
   <input type="button" id="read" value="Proceed to the game" class="btn btn-lg btn-primary" align="center" />
 </body>
 <script type="text/javascript">
-  var variance;
-  if (parent.node.env('roomType') === 'exo_low') {
+  var variance, roomType;
+  roomType = parent.node.env('roomType');
+  if (roomType === 'exo_low') {
     variance = document.getElementById('variance');
     variance.innerHTML = 4;
+  }
+  else if (roomType === 'exo_lowlow') {
+    variance = document.getElementById('variance');
+    variance.innerHTML = 20;
+  }
+  else if (roomType === 'exo_extralow') {
+    variance = document.getElementById('variance');
+    variance.innerHTML = 100;
+  }
+  else if (roomType === 'exo_minor') {
+    variance = document.getElementById('variance');
+    variance.innerHTML = 1000;
   }
 </script>
