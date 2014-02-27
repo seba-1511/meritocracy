@@ -23,4 +23,4 @@ for (i = 0 ; i < nCodes; i ++) {
     });
 }
         
-module.exports = codes;    
+module.exports = codes;

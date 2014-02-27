@@ -211,14 +211,12 @@ module.exports = function(node, channel, room) {
         var code;
         if (settings.AUTH === 'NO') {
             code = dk.codes.db[++noAuthCounter].AccessCode;
-            dk.incrementUsage(code);
             return code;
         }
 
         // Return the id only if token was validated.
         // More checks could be done here to ensure that token is unique in ids.
         if (cookies.token && validCookie) {
-            dk.incrementUsage(code);
             return cookies.token;
         }
     });
@@ -312,6 +310,7 @@ module.exports = function(node, channel, room) {
             var nPlayers, code;
             console.log('-----------Player connected ' + p.id);
 
+            dk.markInvalid(p.id);
             
             if (settings.AUTH === 'MTURK') {
                 dk.checkIn(p.id);
@@ -405,7 +404,7 @@ module.exports = function(node, channel, room) {
             // Client really disconnected (not moved into another game room).
             if (channel.registry.clients.disconnected.get(p.id)) {
                 // Free up the code.
-                dk.decrementUsage(p.id);
+                dk.markValid(p.id);
             }            
         });
 

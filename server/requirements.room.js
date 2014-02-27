@@ -77,7 +77,7 @@ module.exports = function(node, channel, room) {
 	        };
             }
 
-	    if (code.usage) {
+	    if (code.valid === false) {
 		//console.log('Code ' +  mtid + ' already in use ' + code.usage + ' times.');
 		// errUri = '/ultiturk/unauthr.html?id=' + mtid + '&codeInUse=1';
 		// node.redirect(errUri, msg.data.id);

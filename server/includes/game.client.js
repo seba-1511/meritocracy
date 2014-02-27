@@ -252,7 +252,10 @@ stager.setOnInit(function() {
             for (j = 0; j < group.length; j++) {
 
                 player = group[j];
-                text = ' (' + barsValues[2][i][j] + ')';
+                
+                // Uncomment this to show the payoff.
+                // text = ' (' + barsValues[2][i][j] + ')';
+                text = ''; 
 
                 // It is me?
                 if (barsValues[1][0] === i && barsValues[1][1] === j) {
