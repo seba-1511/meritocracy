@@ -346,7 +346,7 @@ module.exports = function(node, channel, room) {
                     console.log('CO!!!!!!!!');
                     accesscode = code.AccessCode;
                     exitcode = code.ExitCode;                    
-                    code.win =  0.25;
+                    code.win =  settings.COMPENSANTION;
                     dk.checkOut(accesscode, exitcode, code.win);
                 }
             }

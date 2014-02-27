@@ -68,6 +68,8 @@ module.exports = {
     // Divider ECU / DOLLARS *
     EXCHANGE_RATE: 266,
 
+    COMPENSANTION: 0.25,
+
     // DEBUG.
     DEBUG: true,
 

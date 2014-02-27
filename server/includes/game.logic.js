@@ -62,9 +62,11 @@ module.exports = function(node, channel, gameRoom) {
     console.log(gameRoom.runtimeConf);
     console.log('=====================');
 
+    DUMP_DIR = path.resolve(__dirname, '..', 'data') + '/' + counter + '/';
+    J.mkdirSyncRecursive(DUMP_DIR, 0777);
+
     // Preparing storage: FILE or MONGODB.
     if (settings.DB === 'FILE') {
-        DUMP_DIR = path.resolve(__dirname, '..', 'data') + '/' + counter + '/';
         DUMP_DIR_JSON = DUMP_DIR + 'json/';
         DUMP_DIR_CSV = DUMP_DIR + 'csv/';
 
