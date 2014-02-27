@@ -46,9 +46,10 @@ function waiting2start() {
         else if (data.gameCompleted) {
             span_msg.innerHTML = 'Unfortunately, the last game just started ' +
                 'and you have not been selected. ' +
-                'We kindly ask you to return the HIT. You are ' +
-                'awarded a compensation of 0.25 USD for your waiting time. ' +
-                'Thank you very much.';
+                'We kindly ask you to return the HIT. You can look for a HIT ' +
+                'called ETH Descil Trouble Ticket for NodeGame and file a  ' +
+                'trouble ticket to get a compensation of 0.25 USD for ' +
+                'your waiting time. Thank you very much.';
         }
     }
         

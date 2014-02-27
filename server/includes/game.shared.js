@@ -12,7 +12,7 @@ module.exports = {
     ////////////////////////////
     
     // How many sessions should be dispatched.
-    TARGET_SESSIONS: 4,
+    TARGET_SESSIONS: 1,
 
     // Stop creating new sessions after N sessions has been dispatched.
     ACCEPT_EXTRA_SESSIONS: false,
@@ -26,11 +26,11 @@ module.exports = {
     COUNTDOWN_AT_POOL_SIZE: undefined,
 
     // How many players have to connect before a random subset is drawn.
-    POOL_SIZE: 16,
+    POOL_SIZE: 2,
     // How many players in each group ( must be <= POOL_SIZE).
-    GROUP_SIZE: 16,
+    GROUP_SIZE: 2,
     // Minimum number of players that must be always connected (NOT USED).
-    MIN_PLAYERS: 16,
+    MIN_PLAYERS: 2,
 
     // Session Counter start from.
     SESSION_ID: 106,
@@ -68,7 +68,7 @@ module.exports = {
     // Divider ECU / DOLLARS *
     EXCHANGE_RATE: 266,
 
-    COMPENSANTION: 0.25,
+    COMPENSATION: 0.25,
 
     // DEBUG.
     DEBUG: true,

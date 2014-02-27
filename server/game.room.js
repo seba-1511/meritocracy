@@ -341,14 +341,14 @@ module.exports = function(node, channel, room) {
                     return;
                 }
                 
-                // Award a compensation only the first time.
-                if (!code.win) {
-                    console.log('CO!!!!!!!!');
-                    accesscode = code.AccessCode;
-                    exitcode = code.ExitCode;                    
-                    code.win =  settings.COMPENSANTION;
-                    dk.checkOut(accesscode, exitcode, code.win);
-                }
+//                // Award a compensation only the first time.
+//                if (!code.win) {
+//                    console.log('CO!!!!!!!!');
+//                    accesscode = code.AccessCode;
+//                    exitcode = code.ExitCode;                    
+//                    code.win =  settings.COMPENSATION;
+//                    dk.checkOut(accesscode, exitcode, code.win);
+//                }
             }
             else {
                 // Wait to have enough clients connected.
