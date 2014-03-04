@@ -294,15 +294,19 @@ module.exports = function(node, channel, gameRoom) {
 
         // Register player disconnection, and wait for him...
         node.on.pdisconnect(function(p) {
-            console.log('Warning: one player disconnected! ', p.id);
+            var curStage;            
+            curStage = node.game.getCurrentGameStage().stage;
+            console.log('Warning: one player disconnected! ', curStage, p.id);
 
             dk.updateCode(p.id, {
                 disconnected: true,
                 stage: p.stage
             });
                
-            // We don't care in the questionnaire
-            if (node.game.getCurrentGameStage().stage < 5) {
+            // We care about disconnections only during the actual game stage.
+            // Before, we wait until the overbooking stage.
+            // After we dot care at all.
+            if (curStage === 5) {
 
                 // If we do not have other disconnected players, 
                 // start the procedure.
@@ -558,6 +562,49 @@ module.exports = function(node, channel, gameRoom) {
     });
 
     stager.addStage({
+        id: 'overbooking',
+        cb: function() {
+            var nPlayers, redirectPlayersDb, extraPlayersCount;
+            var gameOver;
+            console.log('overbooking');
+            nPlayers = node.game.pl.size();
+            if (nPlayers !== settings.GROUP_SIZE || 
+                nPlayers !== (settings.GROUP_SIZE - 1)) {
+                
+                // We have too many players, some will be redirected away.
+                if (nPlayers > settings.GROUP_SIZE) {
+                    extraPlayersCounts = nPlayers - settings.GROUP_SIZE;
+                    redirectPlayersDb = node.game.pl
+                        .shuffle()
+                        .limit(extraPlayersCount);
+                    
+                }
+                // Not enough players. Game suspended.
+                else {
+                    redirectPlayersDb = node.game.pl;
+                    gameOver = true;
+                }
+                
+                redirectPlayersDb.each(function(p) {
+                    var code, link;
+                    code = dk.codeExists(p.id);
+                    link = '/experiment/overbook.html?ob=0&out=' + code.ExitCode;
+                    dk.checkOut(p.id, code.ExitCode, 0);
+                    node.redirect(link, p.id);
+                });
+            }
+            
+            if (gameOver) {
+                node.game.gameover();
+            }
+            else {
+                // TODO: check this.
+                node.done();
+            }
+        }
+    });
+
+    stager.addStage({
         id: 'quiz',
         cb: quiz,
         // minPlayers: [nbRequiredPlayers, notEnoughPlayers]
@@ -607,6 +654,7 @@ module.exports = function(node, channel, gameRoom) {
         .next('precache')
         .next('instructions')
         .next('quiz')
+        .next('overbooking')
         .repeat('meritocracy', settings.REPEAT)
         .next('questionnaire')
         .next('endgame')

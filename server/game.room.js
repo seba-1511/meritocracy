@@ -229,6 +229,7 @@ module.exports = function(node, channel, room) {
         var COUNTDOWN_AT_POOL_SIZE = settings.COUNTDOWN_AT_POOL_SIZE;
         var POOL_SIZE = settings.POOL_SIZE;
         var GROUP_SIZE = settings.GROUP_SIZE;
+        var GROUP_OVERBOOKING = settings.GROUP_OVERBOOKING;
 
         // Countdown
         var countdown;
@@ -278,7 +279,8 @@ module.exports = function(node, channel, room) {
             mySettings = {
                 MIN_PLAYERS: settings.MIN_PLAYERS,
                 SUBGROUP_SIZE: settings.SUBGROUP_SIZE,
-                GROUP_SIZE: nPlayers >= 16 ? settings.GROUP_SIZE : nPlayers
+                GROUP_SIZE: settings.GROUP_SIZE,
+                GROUP_OVERBOOKING: settings.GROUP_OVERBOOKING
             };
 
             // Settings are kept default.
@@ -412,7 +414,7 @@ module.exports = function(node, channel, room) {
         node.on('DISPATCH', function() {
             var gameRoom, wRoom, tmpPlayerList, assignedRoom;
             var nPlayers, i, len;
-            var runtimeConf;
+            var runtimeConf, totalGroupSize;
 
             // Also check if it should be stopped.
             stopCountdown(true);
@@ -424,13 +426,15 @@ module.exports = function(node, channel, room) {
             console.log('-----------We have enough players: ' + nPlayers);
 
             runtimeConf = adjustGameSettings(nPlayers);
-
             
-            i = -1, len = Math.floor(nPlayers / runtimeConf.GROUP_SIZE);
+            totalGroupSize = runtimeConf.GROUP_SIZE + 
+                runtimeConf.GROUP_OVERBOOKING;
+
+            i = -1, len = Math.floor(nPlayers / totalGroupSize);
             for (; ++i < len;) {
 
                 // Doing the random matching.
-                tmpPlayerList = wRoom.shuffle().limit(runtimeConf.GROUP_SIZE);
+                tmpPlayerList = wRoom.shuffle().limit(totalGroupSize);
 
                 //Assigning a game room to this list of players
                 assignedRoom = decideRoom(settings.CHOSEN_TREATMENT);

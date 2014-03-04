@@ -636,6 +636,13 @@ stager.addStage({
     }
 });
 
+stager.addStage({
+    id: 'overbooking',
+    cb: function() {
+        console.log('overbooking');
+    }
+});
+
 stager.addStep({
     id: 'bid',
     cb: bid,
@@ -788,6 +795,7 @@ stager.init()
     .next('precache')
     .next('instructions')
     .next('quiz')
+    .next('overbooking')
     .repeat('meritocracy', settings.REPEAT)
     .next('questionnaire')
     .next('endgame')

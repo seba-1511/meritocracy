@@ -26,9 +26,12 @@ module.exports = {
     COUNTDOWN_AT_POOL_SIZE: undefined,
 
     // How many players have to connect before a random subset is drawn.
-    POOL_SIZE: 2,
+    POOL_SIZE: 10,
     // How many players in each group ( must be <= POOL_SIZE).
-    GROUP_SIZE: 2,
+    GROUP_SIZE: 5,
+    // How many extra players besides those in GROUP_SIZE will be added.
+    GROUP_OVERBOOKING: 4,
+
     // Minimum number of players that must be always connected (NOT USED).
     MIN_PLAYERS: 2,
 
