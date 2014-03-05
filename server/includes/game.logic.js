@@ -296,6 +296,8 @@ module.exports = function(node, channel, gameRoom) {
                 stage: p.stage
             });
                
+            debugger
+
             if (numOfPlayersMatters(curStage, p.id)) {
 
                 // If we do not have other disconnected players, 
@@ -581,9 +583,8 @@ module.exports = function(node, channel, gameRoom) {
                 if (nPlayers > settings.GROUP_SIZE) {
                     extraPlayersCount = nPlayers - settings.GROUP_SIZE;
                     redirectPlayersDb = node.game.pl
-                    //.shuffle()
-                    //.limit(extraPlayersCount);
-                        .selexec('id', '=', '0_access');
+                        .shuffle()
+                        .limit(extraPlayersCount);                        
                 }
                 // Not enough players. Game suspended.
                 else {
