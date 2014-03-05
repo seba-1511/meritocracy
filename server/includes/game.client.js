@@ -427,7 +427,7 @@ function showResults(bars) {
             };
 
             node.env('auto', function() {
-                node.timer.randomEmit('DONE', 6000);
+                //node.timer.randomEmit('DONE', 6000);
             });
         });
     });
@@ -485,11 +485,11 @@ function bid() {
 
         // AUTOPLAY.
         node.env('auto', function() {
-            node.timer.randomExec(function() {
-                validation = node.game.checkInputs();
-                validInputs = node.game.correctInputs(validation);
-                node.emit('BID_DONE', validInputs, false);
-            }, 4000);
+//            node.timer.randomExec(function() {
+//                validation = node.game.checkInputs();
+//                validInputs = node.game.correctInputs(validation);
+//                node.emit('BID_DONE', validInputs, false);
+//            }, 4000);
         });
 
         // TIMEUP.

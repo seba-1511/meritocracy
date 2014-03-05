@@ -1,0 +1,41 @@
+<!doctype html>
+<title>Game Ended</title>
+<link rel="stylesheet" href="/ultimatum/html/css/bootstrap.min.css" />
+<link rel="stylesheet" type="text/css" href="css/style.css">
+<script src="/javascripts/nodegame-full.js" charset="utf-8"></script>
+<body>
+  <div id="root">
+    <h1>THANK YOU FOR PARTICIPATING.</h1>
+    <span id="ob" style="display:none">
+      Unfortunately, this game can be played only by 16 persons.
+      <span id="motivation">
+        We draw a random lottery to select the participants among those who successfully passed the quiz, and unfortunately you have not been selected.
+      </span> 
+      <br/><br/>
+      You will be paid the full show-up fee of 1USD. Please go back to the Amazon Mechanical Turk web site and submit the hit.
+    </span>    
+    <br/><br/>
+    We usually pay within 24 hours. For any problem, please look for a HIT called <strong>ETH Descil Trouble Ticket</strong> and file a new trouble ticket reporting the following information:
+    <br/><br/>
+    <ul>
+      <li>your turker id</li>
+      <li>your exit code, as written below</li>
+      <li>your browser name and version</li>
+    </ul>
+    <br/>
+    Notice: you do not need the exit code to submit the HIT, but only in case of trouble with the payment.
+  </div>
+</body>
+<script>
+  var overbook, exitcode, motivation;
+  overbook = JSUS.getQueryString("ob");
+  exitcode = JSUS.getQueryString("out");
+  W.writeln("Your exit code is: " + (exitcode || "Error - code not found"));
+  if (overbook) {
+    document.getElementById('ob').style.display = '';  
+    if (overbook === "0") {    
+      motivation = document.getElementById("motivation");
+      motivation.innerHTML = "Too many clients have disconnected at the same time, and the game cannot continue.";
+    }
+  }
+</script>

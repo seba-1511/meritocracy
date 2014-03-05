@@ -211,27 +211,23 @@ module.exports = function(node, channel, gameRoom) {
         SUBGROUP_SIZE: gameRoom.runtimeConf.SUBGROUP_SIZE
     });
 
+    // The number of players has changed...but do we care?
+    function numOfPlayersMatters(stage, id) {
+        var nPlayers;
+        // We care about disconnections only during the actual game stage.
+        // Before, we wait until the overbooking stage.
+        // After we dot care at all.
+        if (stage !== 5) return false;
+        // Should not be a player leaving cause of overbooking.
+        return 'undefined' === typeof node.game.overbooked[id];
 
-    function doMatch() {
-        var g, bidder, respondent, data_b, data_r;
-
-        g = node.game.pl.shuffle();
-        bidder = g.first();
-        respondent = g.last();
-
-        data_b = {
-            role: 'bidder',
-            other: respondent.id
-        };
-        data_r = {
-            role: 'respondent',
-            other: bidder.id
-        };
-        // Send a message to each player with their role
-        // and the id of the other player.
-        node.say('BIDDER', bidder.id, data_b);
-        node.say('RESPONDENT', respondent.id, data_r);
-        console.log('Matching completed.');
+        // NOT USED FOR NOW.
+        nPlayers = node.game.pl.size();
+        // These disconections are likely to be players leaving
+        // from overbooking stage. Ignore them.
+        if (nPlayers >= settings.GROUP_SIZE) return false;
+        // This is a real disconnection.
+        return nPlayers < settings.GROUP_SIZE;        
     }
 
     // Event handler registered in the init function are always valid.
@@ -242,6 +238,8 @@ module.exports = function(node, channel, gameRoom) {
         
         // Players that disconnected temporarily.
         node.game.disconnected = {};
+        // Players sent away due to overbooking.
+        node.game.overbooked = {};
 
         // "STEPPING" is the last event emitted before the stage is updated.
         node.on('STEPPING', function() {
@@ -282,11 +280,6 @@ module.exports = function(node, channel, gameRoom) {
             console.log(node.nodename, ' - Round:  ', currentStage);
         });
 
-// THIS WAS HERE BEFORE: delete if not needed.
-//         node.game.memory.on('insert', function(data) {
-//             data.group = node.game.pl.selexec('id', '=', data.player).first().group;
-//         });
-
         // Add session name to data in DB.
         node.game.memory.on('insert', function(o) {
             o.session = node.nodename;
@@ -303,10 +296,7 @@ module.exports = function(node, channel, gameRoom) {
                 stage: p.stage
             });
                
-            // We care about disconnections only during the actual game stage.
-            // Before, we wait until the overbooking stage.
-            // After we dot care at all.
-            if (curStage === 5) {
+            if (numOfPlayersMatters(curStage, p.id)) {
 
                 // If we do not have other disconnected players, 
                 // start the procedure.
@@ -329,11 +319,14 @@ module.exports = function(node, channel, gameRoom) {
 
                         node.remoteCommand('resume', 'ALL');
                     }, 30000);
-                }
+                }                
             }
 
-            // delete node.game.memory.stage[node.game.getCurrentGameStage()];
+            // Only if the disconnection is not related to players sent away
+            // for over
+            // if ('undefined' === typeof node.game.overbooked[p.id]) {
             node.game.disconnected[p.id] = '';
+            // }
         });
 
 
@@ -356,8 +349,21 @@ module.exports = function(node, channel, gameRoom) {
             }
 
             if (code.kickedOut) {
-                node.redirect('html/disconnected.htm', code);
+                // It is not added automatically.
+                // This could be improved, maybe not throwing the exception.
+                node.game.pl.add(p);
+                node.redirect('html/disconnected.htm', p.id);
                 console.log('game.logic: kicked out player tried to ' + 
+                            'reconnect: ' + p.id);
+                return;
+            }
+
+            if (code.checkedOut) {
+                // It is not added automatically.
+                // This could be improved, maybe not throwing the exception.
+                node.game.pl.add(p);
+                node.redirect('html/obco.html?co=1&out=' + code.ExitCode, p.id);
+                console.log('game.logic: checked out player tried to ' + 
                             'reconnect: ' + p.id);
                 return;
             }
@@ -454,8 +460,9 @@ module.exports = function(node, channel, gameRoom) {
                     }
                 });                
             }
-            else {
-                node.say('notEnoughPlayers', p.id);
+            // Check if we care about disconnected players.
+            else if (numOfPlayersMatters()) {
+                node.say('notEnoughPlayers', p.id);                
             }
             console.log('init');
         });
@@ -482,12 +489,6 @@ module.exports = function(node, channel, gameRoom) {
 
     function quiz() {
         console.log('Quiz');
-    }
-
-    function meritocracy() {
-        // debugger
-        console.log('Ultimatum');
-        doMatch();
     }
 
     function questionnaire() {
@@ -565,36 +566,45 @@ module.exports = function(node, channel, gameRoom) {
         id: 'overbooking',
         cb: function() {
             var nPlayers, redirectPlayersDb, extraPlayersCount;
-            var gameOver;
+            var ob;
             console.log('overbooking');
+            
+            // Query string variable for redirection: if 1 it is a normal
+            // overbooking, if 0, we had some many disconnections already
+            // that the game cannot start at all.
+            ob = 1;            
             nPlayers = node.game.pl.size();
-            if (nPlayers !== settings.GROUP_SIZE || 
+            if (nPlayers !== settings.GROUP_SIZE && 
                 nPlayers !== (settings.GROUP_SIZE - 1)) {
                 
                 // We have too many players, some will be redirected away.
                 if (nPlayers > settings.GROUP_SIZE) {
-                    extraPlayersCounts = nPlayers - settings.GROUP_SIZE;
+                    extraPlayersCount = nPlayers - settings.GROUP_SIZE;
                     redirectPlayersDb = node.game.pl
-                        .shuffle()
-                        .limit(extraPlayersCount);
-                    
+                    //.shuffle()
+                    //.limit(extraPlayersCount);
+                        .selexec('id', '=', '0_access');
                 }
                 // Not enough players. Game suspended.
                 else {
                     redirectPlayersDb = node.game.pl;
-                    gameOver = true;
+                    ob = 0;
                 }
                 
                 redirectPlayersDb.each(function(p) {
                     var code, link;
                     code = dk.codeExists(p.id);
-                    link = '/experiment/overbook.html?ob=0&out=' + code.ExitCode;
+                    link = 'html/obco.html?ob=' + ob + 
+                        '&out=' + code.ExitCode;
                     dk.checkOut(p.id, code.ExitCode, 0);
+                    // Save the id of redirected player.
+                    node.game.overbooked[p.id] = '';
+                    // Redirect.
                     node.redirect(link, p.id);
                 });
             }
             
-            if (gameOver) {
+            if (!ob) {
                 node.game.gameover();
             }
             else {

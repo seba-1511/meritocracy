@@ -182,15 +182,23 @@ module.exports = function(node, channel, room) {
         
         code = dk.codeExists(token);
         
+        console.log(code);
+        console.log("-------------------");
+
         // Code not existing.
 	if (!code) {
             console.log('not existing token: ', token);
             return false;
         }
         
+        if (code.checkedOut) {
+            console.log('token was already checked out: ', token);
+            return false;
+        }
+
         // Code in use.
         //  usage is for LOCAL check, IsUsed for MTURK
-	if (code.usage || code.IsUsed) {
+	if (code.valid === false) {
             if (code.disconnected) {
                 return true;
             }
