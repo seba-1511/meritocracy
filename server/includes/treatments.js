@@ -541,29 +541,31 @@ treatments.exo_perfect = {
 };
 
 
-// EXO HIGH.
-treatments.exo_high = {
+treatments.exo_v2 = {
     sendResults: sendNoisyResults   
 };
 
-// EXO LOW.
-treatments.exo_low = {
+treatments.exo_v5 = {
     sendResults: sendNoisyResults
 };
 
-
-// EXO LOWLOW.
-treatments.exo_lowlow = {
+treatments.exo_v10 = {
     sendResults: sendNoisyResults
 };
 
-// EXO EXTRALOW.
-treatments.exo_extralow = {
+treatments.exo_v20 = {
     sendResults: sendNoisyResults
 };
 
-// EXO MINOR.
-treatments.exo_minor = {
+treatments.exo_v50 = {
+    sendResults: sendNoisyResults
+};
+
+treatments.exo_v100 = {
+    sendResults: sendNoisyResults
+};
+
+treatments.exo_v1000 = {
     sendResults: sendNoisyResults
 };
 

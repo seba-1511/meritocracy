@@ -81,28 +81,32 @@ module.exports = function(node, channel, room) {
             group: 'random',
             logicPath: logicPath,
         }, 
-        exo_low: {
-            group: 'exo_low',
-            logicPath: logicPath,
-        }, 
-        exo_high: {
-            group: 'exo_high',
-            logicPath: logicPath,
-        }, 
         exo_perfect: {
             group: 'exo_perfect',
             logicPath: logicPath,
-        },
-        exo_lowlow: {
-            group: 'exo_lowlow',
+        },        
+        exo_v2: {
+            group: 'exo_v2',
+            logicPath: logicPath,
+        }, 
+        exo_v5: {
+            group: 'exo_v5',
+            logicPath: logicPath,
+        }, 
+        exo_v10: {
+            group: 'exo_v10',
             logicPath: logicPath,
         },
-        exo_extralow: {
-            group: 'exo_extralow',
+        exo_v20: {
+            group: 'exo_v20',
             logicPath: logicPath,
         },
-        exo_minor: {
-            group: 'exo_minor',
+        exo_v100: {
+            group: 'exo_v100',
+            logicPath: logicPath,
+        },
+        exo_v1000: {
+            group: 'exo_v1000',
             logicPath: logicPath,
         },
 
@@ -117,16 +121,16 @@ module.exports = function(node, channel, room) {
         }
         else {
             if (sessionCounter === 1) {
-                treatment = 'exo_lowlow';
+                treatment = 'exo_v10';
             }
             else if (sessionCounter === 2) {
-                treatment = 'exo_extralow';
+                treatment = 'exo_v5';
             }
             else if (sessionCounter === 3) {
-                treatment = 'exo_minor';
+                treatment = 'exo_v2';
             }
             else {
-                treatment = 'random';
+                treatment = 'exo_perfect';
             }
         }
         // Implement logic here.

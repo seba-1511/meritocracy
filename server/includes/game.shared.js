@@ -12,7 +12,7 @@ module.exports = {
     ////////////////////////////
     
     // How many sessions should be dispatched.
-    TARGET_SESSIONS: 3,
+    TARGET_SESSIONS: 4,
 
     // Stop creating new sessions after N sessions has been dispatched.
     ACCEPT_EXTRA_SESSIONS: false,
@@ -26,7 +26,7 @@ module.exports = {
     COUNTDOWN_AT_POOL_SIZE: undefined,
 
     // How many players have to connect before a random subset is drawn.
-    POOL_SIZE: 5,
+    POOL_SIZE: 4,
     // How many players in each group ( must be <= POOL_SIZE).
     GROUP_SIZE: 3,
     // How many extra players besides those in GROUP_SIZE will be added.
@@ -36,17 +36,24 @@ module.exports = {
     MIN_PLAYERS: 2,
 
     // Session Counter start from.
-    SESSION_ID: 106,
+    SESSION_ID: 110,
 
     // Game settings.
-    TREATMENTS: ['blackbox', 'endo', 'random',
-                 'exo_low', 'exo_high', 'exo_perfect',
-                 'exo_lowlow', 'exo_extralow', 'exo_minor'
+    TREATMENTS: ['blackbox', 'endo', 'random', 'exo_perfect',
+                 'exo_v2', 'exo_v5', 'exo_v10', 'exo_v20',
+                 'exo_v50', 'exo_v100', 'exo_v1000'
     ],
+
+    // Previous treatment names and variance level
+    // exo_high -> 2
+    // exo_low -> 4
+    // exo_lowlow -> 20
+    // exo_extralow -> 100
+    // exo_minor -> 1000
 
     // Which treatment to play.
     // Leave undefined for a randomly chosen treatment.
-    CHOSEN_TREATMENT: 'rotate_exo_low',
+    CHOSEN_TREATMENT: 'rotation',
 
     // How many times the meritocracy stage is repeated. *
     REPEAT: 20,
@@ -57,11 +64,13 @@ module.exports = {
 
     // Noise standard deviation. High and low "meritocracy".
     NOISE_STD: {
-        exo_high: 1.4142,
-        exo_low: 2,
-        exo_lowlow: 4.472136,
-        exo_extralow: 10,
-        exo_minor: 31.62278
+        exo_v2: 1.4142,
+        exo_v5: 2.236068,
+        exo_v10: 3.162278,  
+        exo_v20: 4.472136,
+        exo_v50: 7.071068,
+        exo_v100: 10,
+        exo_v1000: 31.62278
     },
 
     // Payment settings. *
