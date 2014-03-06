@@ -234,7 +234,7 @@ module.exports = function(node, channel, gameRoom) {
     stager.setOnInit(function() {
         console.log('********************** meritocracy room ' + counter+++' **********************');
 
-
+        node.game.countdown = null;
         
         // Players that disconnected temporarily.
         node.game.disconnected = {};
@@ -296,13 +296,11 @@ module.exports = function(node, channel, gameRoom) {
                 stage: p.stage
             });
                
-            debugger
-
             if (numOfPlayersMatters(curStage, p.id)) {
 
                 // If we do not have other disconnected players, 
                 // start the procedure.
-                if (!J.size(node.game.disconnected)) {
+                if (node.game.countdown === null) {
                     node.say('notEnoughPlayers', 'ALL');        
                     
                     this.countdown = setTimeout(function() {
@@ -318,17 +316,17 @@ module.exports = function(node, channel, gameRoom) {
                         }
                         // Clear list of temporarily disconnected players.
                         node.game.disconnected = {};
-                        this.countdown = null;
+                        node.game.countdown = null;
                         node.remoteCommand('resume', 'ALL');
                     }, 30000);
-                }                
-            }
-
-            // Only if the disconnection is not related to players sent away
-            // for overbooking added to the list of temporarily disconnected.
-            if ('undefined' === typeof node.game.overbooked[p.id]) {
-                node.game.disconnected[p.id] = '';
-            }
+                }
+                
+                // Only if the disconnection is not related to players sent away
+                // for overbooking added to the list of temporarily disconnected.
+                if ('undefined' === typeof node.game.overbooked[p.id]) {
+                    node.game.disconnected[p.id] = '';
+                }
+            }            
         });
 
 
