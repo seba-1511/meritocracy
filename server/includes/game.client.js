@@ -35,6 +35,11 @@ stager.setOnInit(function() {
     var that = this;
     var waitingForPlayers, treatment;
     
+    var intRegex, 
+    // Regular expression to detect integers in contributions.
+    intRegex = /^\d+$/;
+
+
     console.log('INIT PLAYER!');
     
     node.game.INITIAL_COINS = node.env('INITIAL_COINS');
@@ -185,7 +190,7 @@ stager.setOnInit(function() {
         if (!node.game.isValidContribution(contrib)) {
             errorC = document.createElement('p');
             errorC.innerHTML = 'Invalid contribution. ' +
-                'Please enter a number between 0 and 20.';
+                'Please enter an integer number between 0 and 20.';
             divErrors.appendChild(errorC);
         }
 
@@ -197,7 +202,7 @@ stager.setOnInit(function() {
             if (!node.game.isValidDemand(demand)) {
                 errorD = document.createElement('p');
                 errorD.innerHTML = 'Invalid demand. ' +
-                    'Please enter a number between 0 and 20.';
+                    'Please enter an integer number between 0 and 20.';
                 divErrors.appendChild(errorD);
             }
         }
@@ -297,11 +302,13 @@ stager.setOnInit(function() {
     };
 
     this.isValidContribution = function(n) {
+        if (!intRegex.test(n)) return false;
         n = parseInt(n, 10);
         return !isNaN(n) && isFinite(n) && n >= 0 && n <= 20;
     };
 
     this.isValidDemand = function(n) {
+        if (!intRegex.test(n)) return false;
         n = parseInt(n, 10);
         return !isNaN(n) && isFinite(n) && n >= 0 && n <= 20;
     };
@@ -310,7 +317,7 @@ stager.setOnInit(function() {
         var save, groupReturn;
 
         // Shows previous round if round number is not 1.
-        if (node.game.oldContrib) {
+        if (node.game.oldContrib !== null) {
 
             save = node.game.INITIAL_COINS - node.game.oldContrib;
             groupReturn = node.game.oldPayoff - save;
@@ -485,11 +492,11 @@ function bid() {
 
         // AUTOPLAY.
         node.env('auto', function() {
-            node.timer.randomExec(function() {
-                validation = node.game.checkInputs();
-                validInputs = node.game.correctInputs(validation);
-                node.emit('BID_DONE', validInputs, false);
-            }, 4000);
+//             node.timer.randomExec(function() {
+//                 validation = node.game.checkInputs();
+//                 validInputs = node.game.correctInputs(validation);
+//                 node.emit('BID_DONE', validInputs, false);
+//             }, 4000);
         });
 
         // TIMEUP.
