@@ -287,7 +287,7 @@ module.exports = function(node, channel, gameRoom) {
 
         // Register player disconnection, and wait for him...
         node.on.pdisconnect(function(p) {
-            var curStage;            
+            var curStage;        
             curStage = node.game.getCurrentGameStage().stage;
             console.log('Warning: one player disconnected! ', curStage, p.id);
 
@@ -318,17 +318,17 @@ module.exports = function(node, channel, gameRoom) {
                         }
                         // Clear list of temporarily disconnected players.
                         node.game.disconnected = {};
-
+                        this.countdown = null;
                         node.remoteCommand('resume', 'ALL');
                     }, 30000);
                 }                
             }
 
             // Only if the disconnection is not related to players sent away
-            // for over
-            // if ('undefined' === typeof node.game.overbooked[p.id]) {
-            node.game.disconnected[p.id] = '';
-            // }
+            // for overbooking added to the list of temporarily disconnected.
+            if ('undefined' === typeof node.game.overbooked[p.id]) {
+                node.game.disconnected[p.id] = '';
+            }
         });
 
 
