@@ -356,8 +356,8 @@ stager.setOnInit(function() {
         alert('Connection with the server was terminated. If you think ' +
               'this is an error, please try to refresh the page. You can ' +
               'also look for a HIT called ETH Descil Trouble Ticket for ' +
-              'nodeGame and file an error report. Thank you for your ' +
-              'collaboration.');
+              'Decision Making Study and file an error report. Thank you ' +
+              'for your collaboration.');
     });
 
 });
@@ -492,11 +492,11 @@ function bid() {
 
         // AUTOPLAY.
         node.env('auto', function() {
-//             node.timer.randomExec(function() {
-//                 validation = node.game.checkInputs();
-//                 validInputs = node.game.correctInputs(validation);
-//                 node.emit('BID_DONE', validInputs, false);
-//             }, 4000);
+             node.timer.randomExec(function() {
+                 validation = node.game.checkInputs();
+                 validInputs = node.game.correctInputs(validation);
+                 node.emit('BID_DONE', validInputs, false);
+             }, 4000);
         });
 
         // TIMEUP.

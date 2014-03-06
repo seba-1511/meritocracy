@@ -27,7 +27,7 @@ function Requirements() {
         alert('Ooops. You are missing the access code. This is likely to be ' +
               'due to a technical error on our server.\n\nPlease return the ' +
               'HIT immediately, and look for a HIT called "ETH Descil Trouble ' +
-              'Ticket". Please report your worker id, your ' +
+              'Ticket for Decision Making Study". Please report your worker id, your ' +
               'browser, and the steps you have followed to accept this HIT. ' +
               'You will receive a compensation of 0.25 USD for your trouble. ' +
               'Compensantion can be claimed only once.' +
