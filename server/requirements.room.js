@@ -41,14 +41,12 @@ module.exports = function(node, channel, room) {
         });
 
 	node.on.preconnect(function(player) {
-            console.log('Player connected to Requirements room.');
+            console.log('Player re-connected to Requirements room.');
             node.game.pl.add(player);
-            node.remoteCommand('start', player.id);
 	});
 
 	node.on.pconnect(function(player) {
             console.log('Player connected to Requirements room.');
-            node.remoteCommand('start', player.id);
 	});
 
         node.on('MTID', function(msg) {
