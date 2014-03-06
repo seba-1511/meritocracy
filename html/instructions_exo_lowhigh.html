@@ -10,7 +10,7 @@
       <div id="lowhigh">
         <p>Welcome to our experiment ! 16 people, that is you and 15 others, have joined us.</p>
 
-        <p><strong>Your decision.</strong><br /> You will receive 20 coins per round for 20 rounds. Each round, you will have to choose how many coins to put directly into your personal account, and how many coins to put into a group account.</p>
+        <p><strong>Your decision.</strong><br /> You will receive 20 coins per round for 25 rounds. Each round, you will have to choose how many coins to put directly into your personal account, and how many coins to put into a group account.</p>
 
         <p><strong>Group matching with noise.</strong><br /> Each round you will be assigned to a new group of 4 people, that is, you and three (possibly different) others. Which group you are assigned to depends on your and others contributions to the group account, as described in the following three steps.</p>
 
@@ -47,7 +47,7 @@
           </tfoot>
         </table>
         <p>
-          <strong>Total return.</strong><br />You will be paid according to the final amount of coins earned over the whole experiment. 20 coins are equal to 0.075 USD, and the maximum amount you can win is 800 coins, equivalent to 3 USD.
+          <strong>Total return.</strong><br />You will be paid according to the final amount of coins earned over the whole experiment. 20 coins are roughly equal to 0.06 USD, and the maximum amount you can win is 1000 coins, equivalent to 3 USD.
         </p>
       </div>
     </div>
@@ -58,20 +58,22 @@
 <script type="text/javascript">
   var variance, roomType;
   roomType = parent.node.env('roomType');
-  if (roomType === 'exo_low') {
-    variance = document.getElementById('variance');
-    variance.innerHTML = 4;
-  }
-  else if (roomType === 'exo_lowlow') {
-    variance = document.getElementById('variance');
-    variance.innerHTML = 20;
-  }
-  else if (roomType === 'exo_extralow') {
-    variance = document.getElementById('variance');
-    variance.innerHTML = 100;
-  }
-  else if (roomType === 'exo_minor') {
-    variance = document.getElementById('variance');
-    variance.innerHTML = 1000;
-  }
+  variance = document.getElementById('variance');
+  variance.innerHTML = roomType.split('exo_v')[1];
+//   if (roomType === 'exo_low') {
+//     variance = document.getElementById('variance');
+//     variance.innerHTML = 4;
+//   }
+//   else if (roomType === 'exo_lowlow') {
+//     variance = document.getElementById('variance');
+//     variance.innerHTML = 20;
+//   }
+//   else if (roomType === 'exo_extralow') {
+//     variance = document.getElementById('variance');
+//     variance.innerHTML = 100;
+//   }
+//   else if (roomType === 'exo_minor') {
+//     variance = document.getElementById('variance');
+//     variance.innerHTML = 1000;
+//   }
 </script>

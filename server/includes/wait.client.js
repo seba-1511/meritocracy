@@ -47,7 +47,7 @@ function waiting2start() {
             span_msg.innerHTML = 'Unfortunately, the last game just started ' +
                 'and you have not been selected. ' +
                 'We kindly ask you to return the HIT. You can look for a HIT ' +
-                'called ETH Descil Trouble Ticket for NodeGame and file a  ' +
+                'called ETH Descil Trouble Ticket and file a  ' +
                 'trouble ticket to get a compensation of 0.25 USD for ' +
                 'your waiting time. Thank you very much.';
         }

@@ -26,11 +26,11 @@ module.exports = {
     COUNTDOWN_AT_POOL_SIZE: undefined,
 
     // How many players have to connect before a random subset is drawn.
-    POOL_SIZE: 4,
+    POOL_SIZE: 16,
     // How many players in each group ( must be <= POOL_SIZE).
-    GROUP_SIZE: 3,
+    GROUP_SIZE: 16,
     // How many extra players besides those in GROUP_SIZE will be added.
-    GROUP_OVERBOOKING: 1,
+    GROUP_OVERBOOKING: 0,
 
     // Minimum number of players that must be always connected (NOT USED).
     MIN_PLAYERS: 2,
@@ -56,7 +56,7 @@ module.exports = {
     CHOSEN_TREATMENT: 'rotation',
 
     // How many times the meritocracy stage is repeated. *
-    REPEAT: 20,
+    REPEAT: 25,
     // Names of the groups.
     GROUP_NAMES: ['1', '2', '3', '4'],
     // How many player in each group. *
@@ -78,7 +78,7 @@ module.exports = {
     INITIAL_COINS: 20,
 
     // Divider ECU / DOLLARS *
-    EXCHANGE_RATE: 266,
+    EXCHANGE_RATE: 333, // 266 for 20 rounds
 
     COMPENSATION: 0.25,
 
