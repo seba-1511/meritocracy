@@ -48,8 +48,8 @@ function waiting2start() {
                 'and you have not been selected. ' +
                 'We kindly ask you to return the HIT. You can look for a HIT ' +
                 'called ETH Descil Trouble Ticket for Decision Making Study ' +
-                'to get a compensation of 0.25 USD for ' +
-                'and file a your waiting time. Thank you very much.';
+                'to get a compensation of 0.25 USD for your waiting time. ' +
+                'Thank you very much.';
         }
     }
         
