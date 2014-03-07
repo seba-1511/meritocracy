@@ -13,7 +13,7 @@
 
 var nCodes, i, codes;
 
-nCodes = 100;
+nCodes = 1000;
 codes = [];
 
 for (i = 0 ; i < nCodes; i ++) {

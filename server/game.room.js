@@ -101,6 +101,10 @@ module.exports = function(node, channel, room) {
             group: 'exo_v20',
             logicPath: logicPath,
         },
+        exo_v50: {
+            group: 'exo_v50',
+            logicPath: logicPath,
+        },
         exo_v100: {
             group: 'exo_v100',
             logicPath: logicPath,
@@ -121,16 +125,19 @@ module.exports = function(node, channel, room) {
         }
         else {
             if (sessionCounter === 1) {
-                treatment = 'exo_v10';
+                treatment = 'random';
             }
             else if (sessionCounter === 2) {
-                treatment = 'exo_v5';
+                treatment = 'exo_v1000';
             }
             else if (sessionCounter === 3) {
-                treatment = 'exo_v2';
+                treatment = 'exo_v100';
+            }
+            else if (sessionCounter === 4) {
+                treatment = 'exo_v50';
             }
             else {
-                treatment = 'exo_perfect';
+                treatment = 'exo_v20';
             }
         }
         // Implement logic here.

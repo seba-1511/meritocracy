@@ -12,7 +12,7 @@ module.exports = {
     ////////////////////////////
     
     // How many sessions should be dispatched.
-    TARGET_SESSIONS: 4,
+    TARGET_SESSIONS: 5,
 
     // Stop creating new sessions after N sessions has been dispatched.
     ACCEPT_EXTRA_SESSIONS: false,
@@ -26,9 +26,9 @@ module.exports = {
     COUNTDOWN_AT_POOL_SIZE: undefined,
 
     // How many players have to connect before a random subset is drawn.
-    POOL_SIZE: 8,
+    POOL_SIZE: 20,
     // How many players in each group ( must be <= POOL_SIZE).
-    GROUP_SIZE: 4,
+    GROUP_SIZE: 16,
     // How many extra players besides those in GROUP_SIZE will be added.
     GROUP_OVERBOOKING: 4,
 
@@ -36,7 +36,7 @@ module.exports = {
     MIN_PLAYERS: 2,
 
     // Session Counter start from.
-    SESSION_ID: 110,
+    SESSION_ID: 114,
 
     // Game settings.
     TREATMENTS: ['blackbox', 'endo', 'random', 'exo_perfect',
@@ -86,7 +86,7 @@ module.exports = {
     DEBUG: true,
 
     // AUTO-PLAY.
-    AUTO: true,
+    AUTO: false,
 
     // DATABASE.
     DB: 'FILE', // FILE, MONGODB
