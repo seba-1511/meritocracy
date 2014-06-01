@@ -13,8 +13,13 @@ module.exports = function(node, channel, room) {
 
     var J = require('JSUS').JSUS;
 
+    var settings = channel.servernode.getGamesInfo('meritocracy');
+
     // Load shared settings.
-    var settings = require(__dirname + '/includes/game.shared.js');
+    var settings2 = require(__dirname + '/includes/game.shared.js');
+
+    debugger
+    
 
     // Reads in descil-mturk configuration.
     var confPath = path.resolve(__dirname, 'descil.conf.js');
@@ -465,6 +470,9 @@ module.exports = function(node, channel, room) {
                 // - logicPath: the path to the file containing the logic (string)
                 // - channel: a reference to the channel of execution (ServerChannel)
                 // - group: a name to group together multiple game rooms (string)
+                //
+                // The constructor also moves the client from this room into 
+                // the new room
                 gameRoom = channel.createGameRoom({
                     group: assignedRoom.group,
                     clients: tmpPlayerList,
