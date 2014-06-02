@@ -9,26 +9,22 @@
  */
 module.exports = function(node, channel, room) {
 
+    var ngc = require('nodegame-client');
     var path = require('path');
-
     var J = require('JSUS').JSUS;
 
-    var settings = channel.servernode.getGamesInfo('meritocracy');
-
-    // Load shared settings.
-    var settings2 = require(__dirname + '/includes/game.shared.js');
-
-    debugger
-    
+    // Load Meritocracy settings;
+    var gameInfo = channel.servernode.getGamesInfo('meritocracy');
+    var settings = gameInfo.treatments.standard;
 
     // Reads in descil-mturk configuration.
-    var confPath = path.resolve(__dirname, 'descil.conf.js');
+    var descilConfPath = path.resolve(__dirname, 'descil.conf.js');
 
     // Load the code database.
-    var dk = require('descil-mturk')(confPath);
+    var dk = require('descil-mturk')(descilConfPath);
     function codesNotFound() {
         if (!dk.codes.size()) {
-            throw new Error('game.room: no codes found.');
+            throw new Error('Meritocracy game.room: no codes found.');
         }
         // Add a ref to the node obj.
         node.dk = dk;
@@ -40,6 +36,11 @@ module.exports = function(node, channel, room) {
     else {
         dk.readCodes(codesNotFound);
     }
+
+    
+    // Set first treatment to true. Each Group plays two treatments.
+    room.firstTreatment = true;
+
 
     // How many sessions should be dispatched.
     var TARGET_SESSIONS = settings.TARGET_SESSIONS;
@@ -62,73 +63,96 @@ module.exports = function(node, channel, room) {
     var ngdb = new Database(node);
     var mdb = ngdb.getLayer('MongoDB');
 
-    // Load the nodegame-client object.
-    var ngc = require('nodegame-client');
-
     // Creates a Stager object. It will be used to define the sequence of
     // stages for this waiting rooms.
-    var stager = new node.Stager();
+    var stager = new node.Stager()
 
-    // Loading the logic rules that will be used in each sub-gaming room.
-    var logicPath = __dirname + '/includes/game.logic';
-
-    // Creating the array for association between room and their logic
-    var roomLogics = {
-        blackbox: {
-            group: 'blackbox',
-            logicPath: logicPath,
-        }, 
-        endo: {
-            group: 'endo',
-            logicPath: logicPath,
-        }, 
-        random: {
-            group: 'random',
-            logicPath: logicPath,
-        }, 
-        exo_perfect: {
-            group: 'exo_perfect',
-            logicPath: logicPath,
-        },        
-        exo_v2: {
-            group: 'exo_v2',
-            logicPath: logicPath,
-        }, 
-        exo_v5: {
-            group: 'exo_v5',
-            logicPath: logicPath,
-        }, 
-        exo_v10: {
-            group: 'exo_v10',
-            logicPath: logicPath,
-        },
-        exo_v20: {
-            group: 'exo_v20',
-            logicPath: logicPath,
-        },
-        exo_v50: {
-            group: 'exo_v50',
-            logicPath: logicPath,
-        },
-        exo_v100: {
-            group: 'exo_v100',
-            logicPath: logicPath,
-        },
-        exo_v1000: {
-            group: 'exo_v1000',
-            logicPath: logicPath,
-        },
-
-    };
+    // Creating a unique game stage that will handle all incoming connections.
+    stager.addStage({
+        id: 'waiting',
+        cb: function () {
+            // Returning true in a stage callback means execution ok.
+            return true;
+        }
+    });
 
     // Assigns a treatment condition to a group.
     function decideRoom(treatment) {
+        var treats;
         ++sessionCounter;
-        if ('undefined' === typeof treatment) {            
-            treatment = J.randomInt(0,settings.TREATMENTS.length);
-            treatment = settings.TREATMENTS[treatment];
+        if ('undefined' === typeof treatment) {
+            treats = Object.keys(gameInfo.treatments);
+            treatment = J.randomInt(0, treats.length);
+            treatment = gameInfo.treatments[treatment];
         }
-        else {
+        else if ('string' !== typeof treatment) {
+            throw new TypeError('Meritrocracy game.room: CHOSEN_TREATMENT ' +
+                                'must be string or undefined.');
+        }
+
+        // lab:
+        // 6 sessions, with two parallel groups, playing two treatments each
+        if (treatment === 'LAB') {
+            switch(settings.SESSION_ID) {
+            case 1:
+                if (channel.name === 'MERIT_A') {
+                    treatment = room.firstTreatment ? 'exo_perfect' : 'random';
+                }
+                else {
+                    treatment = room.firstTreatment ? 'exo_v20' : 'exo_v3';
+                }
+                break;
+            
+            case 2:
+                if (channel.name === 'MERIT_A') {
+                    treatment = room.firstTreatment ? 'random' : 'exo_perfect';
+                }
+                else {
+                    treatment = room.firstTreatment ? 'exo_v3' : 'exo_v20';
+                }
+                break;
+                
+             
+            case 3:
+                if (channel.name === 'MERIT_A') {
+                    treatment = room.firstTreatment ? 'exo_perfect' : 'exo_v20';
+                }
+                else {
+                    treatment = room.firstTreatment ? 'random' : 'exo_v3';
+                }
+                break;
+
+            case 4:
+                if (channel.name === 'MERIT_A') {
+                    treatment = room.firstTreatment ? 'exo_v20' : 'exo_perfect';
+                }
+                else {
+                    treatment = room.firstTreatment ? 'exo_v3' : 'random';
+                }
+                break;
+
+            case 5:
+                if (channel.name === 'MERIT_A') {
+                    treatment = room.firstTreatment ? 'exo_perfect' : 'exo_v3';
+                }
+                else {
+                    treatment = room.firstTreatment ? 'random' : 'exo_v20';
+                }
+                break;
+
+            case 6:
+                if (channel.name === 'MERIT_A') {
+                    treatment = room.firstTreatment ? 'exo_v3' : 'exo_perfect';
+                }
+                else {
+                    treatment = room.firstTreatment ? 'exo_v20' : 'random';
+                }
+                break;
+            }
+
+        }
+        // online
+        else if (treatment === 'rotation') {
             if (sessionCounter === 1) {
                 treatment = 'random';
             }
@@ -145,8 +169,9 @@ module.exports = function(node, channel, room) {
                 treatment = 'exo_v20';
             }
         }
+
         // Implement logic here.
-        return roomLogics[treatment];
+        return gameInfo.treatments[treatment];
     }
 
     // You can share objects with the included file. Include them in the
@@ -159,15 +184,6 @@ module.exports = function(node, channel, room) {
     var clientWait = channel.require(__dirname + '/includes/wait.client', {
         ngc: ngc,
         settings: settings
-    });
-
-    // Creating a unique game stage that will handle all incoming connections. 
-    stager.addStage({
-        id: 'waiting',
-        cb: function () {
-            // Returning true in a stage callback means execution ok.
-            return true;
-        }
     });
 
     // Creating an authorization function for the players.
@@ -183,7 +199,7 @@ module.exports = function(node, channel, room) {
         token = cookies.token;
 
         console.log('game.room: checking auth.');
-        
+
         // Weird thing.
         if ('string' !== typeof playerId) {
             console.log('no player: ', player)
@@ -195,9 +211,9 @@ module.exports = function(node, channel, room) {
             console.log('no token: ', token)
             return false;
         }
-        
+
         code = dk.codeExists(token);
-        
+
         console.log(code);
         console.log("-------------------");
 
@@ -206,7 +222,7 @@ module.exports = function(node, channel, room) {
             console.log('not existing token: ', token);
             return false;
         }
-        
+
         if (code.checkedOut) {
             console.log('token was already checked out: ', token);
             return false;
@@ -230,7 +246,7 @@ module.exports = function(node, channel, room) {
     });
 
     // Assigns Player Ids based on cookie token. Must return a string.
-    channel.player.clientIdGenerator(function(headers, cookies, validCookie, 
+    channel.player.clientIdGenerator(function(headers, cookies, validCookie,
                                               ids, info) {
         var code;
         if (settings.AUTH === 'NO') {
@@ -264,7 +280,7 @@ module.exports = function(node, channel, room) {
         function startCountdown(nPlayers, pId) {
             // If COUNTDOWN option is on check whether we should start it.
             if ('undefined' !== typeof COUNTDOWN_AT_POOL_SIZE &&
-                nPlayers >= COUNTDOWN_AT_POOL_SIZE) {                    
+                nPlayers >= COUNTDOWN_AT_POOL_SIZE) {
                 if (!countdown) {
                     // Need to specify update, otherwise update = milliseconds.
                     countdown = node.timer.createTimer({
@@ -279,26 +295,26 @@ module.exports = function(node, channel, room) {
                 else {
                     // Countdown already existing. Send it to the new client.
                     node.say('countdown', pId, countdown.timeLeft);
-                }                
-            }            
+                }
+            }
         }
 
         // Stops the countdown (if that is the case) and notify all players.
         function stopCountdown(success) {
             // If COUNTDOWN option is on check whether we should start it.
-            if ('undefined' !== typeof COUNTDOWN_AT_POOL_SIZE) {            
-                if (countdown && 
+            if ('undefined' !== typeof COUNTDOWN_AT_POOL_SIZE) {
+                if (countdown &&
                     room.clients.player.size() < COUNTDOWN_AT_POOL_SIZE) {
                     // Timer must be destroyed to clear event listeners.
                     node.timer.destroyTimer(countdown);
                     countdown = null;
                     // Send countdown to client.
                     node.say('countdownStop', 'ALL', !success);
-                }                
+                }
             }
         }
 
-        function adjustGameSettings(nPlayers) {            
+        function adjustGameSettings(nPlayers) {
             var mySettings;
             mySettings = {
                 MIN_PLAYERS: settings.MIN_PLAYERS,
@@ -323,7 +339,7 @@ module.exports = function(node, channel, room) {
                     mySettings.SUBGROUP_SIZE = 3;
                 }
             }
-            return mySettings;            
+            return mySettings;
         }
 
         // references...
@@ -337,7 +353,7 @@ module.exports = function(node, channel, room) {
             console.log('-----------Player connected ' + p.id);
 
             dk.markInvalid(p.id);
-            
+
             if (settings.AUTH === 'MTURK') {
                 dk.checkIn(p.id);
             }
@@ -366,12 +382,12 @@ module.exports = function(node, channel, room) {
                     console.log('ERROR: no code for connecting player:', p.id);
                     return;
                 }
-                
+
 //                // Award a compensation only the first time.
 //                if (!code.win) {
 //                    console.log('CO!!!!!!!!');
 //                    accesscode = code.AccessCode;
-//                    exitcode = code.ExitCode;                    
+//                    exitcode = code.ExitCode;
 //                    code.win =  settings.COMPENSATION;
 //                    dk.checkOut(accesscode, exitcode, code.win);
 //                }
@@ -409,7 +425,7 @@ module.exports = function(node, channel, room) {
                 data: node.game.pl.db,
                 to: p.id
             }));
-            
+
             node.game.pl.add(p);
             connectingPlayer(p);
         });
@@ -423,7 +439,7 @@ module.exports = function(node, channel, room) {
         node.on.pconnect(connectingPlayer);
 
         // This callback is executed when a player disconnects from the channel.
-        node.on.pdisconnect(function(p) {            
+        node.on.pdisconnect(function(p) {
             // Also check if it should be stopped.
             stopCountdown();
 
@@ -431,7 +447,7 @@ module.exports = function(node, channel, room) {
             if (channel.registry.clients.disconnected.get(p.id)) {
                 // Free up the code.
                 dk.markValid(p.id);
-            }            
+            }
         });
 
 
@@ -450,8 +466,8 @@ module.exports = function(node, channel, room) {
             console.log('-----------We have enough players: ' + nPlayers);
 
             runtimeConf = adjustGameSettings(nPlayers);
-            
-            totalGroupSize = runtimeConf.GROUP_SIZE + 
+
+            totalGroupSize = runtimeConf.GROUP_SIZE +
                 runtimeConf.GROUP_OVERBOOKING;
 
             i = -1, len = Math.floor(nPlayers / totalGroupSize);
@@ -459,10 +475,10 @@ module.exports = function(node, channel, room) {
 
                 // Doing the random matching.
                 tmpPlayerList = wRoom.shuffle().limit(totalGroupSize);
-
+                debugger
                 //Assigning a game room to this list of players
                 assignedRoom = decideRoom(settings.CHOSEN_TREATMENT);
-                runtimeConf.roomType = assignedRoom.group;
+                runtimeConf.roomType = assignedRoom.name;
 
                 // Creating a sub gaming room.
                 // The object must contains the following information:
@@ -471,29 +487,29 @@ module.exports = function(node, channel, room) {
                 // - channel: a reference to the channel of execution (ServerChannel)
                 // - group: a name to group together multiple game rooms (string)
                 //
-                // The constructor also moves the client from this room into 
+                // The constructor also moves the client from this room into
                 // the new room
                 gameRoom = channel.createGameRoom({
-                    group: assignedRoom.group,
+                    gameName: 'meritocracy',
+                    group: assignedRoom.name,
                     clients: tmpPlayerList,
-                    channel: channel,
-                    logicPath: assignedRoom.logicPath,
-                    runtimeConf: runtimeConf
+                    runtimeConf: runtimeConf                    
                 });
 
-                // Setting metadata, settings, and plot.
-                tmpPlayerList.each(function (p) {
-                    // Clearing the waiting stage.
-                    node.remoteCommand('stop', p.id);
-                    // Setting the actual game.
-                    node.remoteSetup('game_metadata', p.id, client.metadata);
-                    node.remoteSetup('game_settings', p.id, client.settings);
-                    node.remoteSetup('plot', p.id, client.plot);
-                    node.remoteSetup('env', p.id, client.env);
-                    node.remoteSetup('env', p.id, {
-                        roomType: assignedRoom.group
-                    });
-                });
+
+//                 // Setting metadata, settings, and plot.
+//                 tmpPlayerList.each(function (p) {
+//                     // Clearing the waiting stage.
+//                     node.remoteCommand('stop', p.id);
+//                     // Setting the actual game.
+//                     node.remoteSetup('game_metadata', p.id, client.metadata);
+//                     node.remoteSetup('game_settings', p.id, client.settings);
+//                     node.remoteSetup('plot', p.id, client.plot);
+//                     node.remoteSetup('env', p.id, client.env);
+//                     node.remoteSetup('env', p.id, {
+//                         roomType: assignedRoom.name
+//                     });
+//                 });
 
 
                 // Start the logic.
@@ -506,32 +522,32 @@ module.exports = function(node, channel, room) {
                     if (!acceptExtraSessions) {
                         roomClosed = true;
                     }
-                }                                               
+                }
             }
-            
+
             // TODO: node.game.pl.size() is unchanged.
             // We need to check with wRoom.size()
-            if (room.clients.player.size()) {                
+            if (room.clients.player.size()) {
                 node.emit('NOTIFY_LEFTOVER');
             }
         });
-        
-        
+
+
         // If there are some players left out of the matching,
         // notify them that they have to wait more.
         node.on('NOTIFY_LEFTOVER', function() {
             var nPlayers;
             nPlayers = room.clients.player.size();
-            if (nPlayers) {                
+            if (nPlayers) {
                 node.say('waitingRoom', 'ALL', {
                     poolSize: POOL_SIZE,
                     nPlayers: nPlayers,
                     retry: !roomClosed,
                     roomClosed: roomClosed
-                });            
+                });
             }
         });
-        
+
     });
 
     // This function will be executed once node.game.gameover() is called.
@@ -559,7 +575,7 @@ module.exports = function(node, channel, room) {
             publishLevel: 0
         },
         plot: stager.getState(),
-        // If debug is true, the ErrorManager will throw errors 
+        // If debug is true, the ErrorManager will throw errors
         // also for the sub-rooms.
         debug: settings.DEBUG,
         verbosity: 0,

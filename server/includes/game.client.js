@@ -831,4 +831,6 @@ module.exports = function(gameRoom, treatmentName, settings) {
         INITIAL_COINS: settings.INITIAL_COINS
     };
     game.verbosity = 100;
+
+    return game;
 };

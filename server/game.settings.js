@@ -41,7 +41,7 @@ module.exports = {
     MIN_PLAYERS: 4,
 
     // Session Counter start from.
-    SESSION_ID: 114,
+    SESSION_ID: 1, // online last 114
 
     // Game settings.
     TREATMENTS: ['blackbox', 'endo', 'random', 'exo_perfect',
@@ -58,7 +58,7 @@ module.exports = {
 
     // Which treatment to play.
     // Leave undefined for a randomly chosen treatment.
-    CHOSEN_TREATMENT: 'rotation',
+    CHOSEN_TREATMENT: 'LAB',
 
     // How many times the meritocracy stage is repeated. *
     REPEAT: 25,
@@ -70,6 +70,7 @@ module.exports = {
     // Noise standard deviation. High and low "meritocracy".
     NOISE_STD: {
         exo_v2: 1.4142,
+        exo_v3: 1.732051,
         exo_v5: 2.236068,
         exo_v10: 3.162278,  
         exo_v20: 4.472136,
@@ -112,8 +113,6 @@ module.exports = {
             name: "exo_v3",
             fullName: "High Meritocracy V3",
             description: "Low level of variance for a high level of meritocracy.",
-            
-            
         },
 
         exo_v20: {
