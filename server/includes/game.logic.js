@@ -412,7 +412,8 @@ module.exports = function(node, channel, gameRoom) {
 	    node.remoteSetup('plot', p.id, client.plot);
             node.remoteSetup('env', p.id, client.env);
             node.remoteSetup('env', p.id, {
-                treatment: node.env('roomType')
+                treatment: node.env('roomType'),
+                part: node.env('part')
             });
 
 

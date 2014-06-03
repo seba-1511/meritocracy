@@ -60,7 +60,8 @@ module.exports = function(node, channel, room) {
                 MIN_PLAYERS: settings.MIN_PLAYERS,
                 SUBGROUP_SIZE: settings.SUBGROUP_SIZE,
                 GROUP_SIZE: settings.GROUP_SIZE,
-                GROUP_OVERBOOKING: settings.GROUP_OVERBOOKING
+                GROUP_OVERBOOKING: settings.GROUP_OVERBOOKING,
+                part: room.firstTreatment ? 1 : 2
             };
         }
 
@@ -117,8 +118,6 @@ module.exports = function(node, channel, room) {
                 //Assigning a game room to this list of players
                 assignedRoom = decideRoom(channel, room, gameInfo, 
                                           settings.CHOSEN_TREATMENT);
-
-                runtimeConf.roomType = assignedRoom.name;
 
                 // Creating a sub gaming room.
                 // The constructor also moves the client from this room into

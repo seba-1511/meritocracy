@@ -52,10 +52,15 @@ module.exports = function(gameRoom, treatmentName, settings) {
 
         // Change so that roomtype is set as decided in game.room.
         node.game.roomType = node.env('roomType');
+        node.game.part = node.env('part');
 
         if (!node.game.roomType) {
             alert('Missconfigured Game: missing roomType.');
             throw new Error('Missconfigured Game: missing roomType.');
+        }
+        if (!node.game.part) {
+            alert('Missconfigured Game: missing part.');
+            throw new Error('Missconfigured Game: missing part.');
         }
 
         // Adapting the game to the treatment.
@@ -80,18 +85,34 @@ module.exports = function(gameRoom, treatmentName, settings) {
             node.game.bidderPage += 'bidder.html';
             node.game.resultsPage += 'results.html';
             
-            if (node.game.roomType === 'random') {
-                node.game.instructionsPage += 'instructions_random.html';
-                node.game.quizPage += 'quiz_random.html'
-            }
-            else if (node.game.roomType === 'exo_perfect') {
-                node.game.instructionsPage += 'instructions_exo_perfect.html';
-                node.game.quizPage += 'quiz_exo_perfect.html'
-            }
+            if (node.game.part === 1) {
+                if (node.game.roomType === 'random') {
+                    node.game.instructionsPage += 'instructions_random.html';
+                    node.game.quizPage += 'quiz_random.html'
+                }
+                else if (node.game.roomType === 'exo_perfect') {
+                    node.game.instructionsPage += 'instructions_exo_perfect.html';
+                    node.game.quizPage += 'quiz_exo_perfect.html'
+                }
+                else {
+                    node.game.instructionsPage += 'instructions_exo_lowhigh.html';
+                        node.game.quizPage += 'quiz_exo_lowhigh.html';
+                }     
+            }       
             else {
-                node.game.instructionsPage += 'instructions_exo_lowhigh.html';
-                node.game.quizPage += 'quiz_exo_lowhigh.html';
-            }     
+                if (node.game.roomType === 'random') {
+                    node.game.instructionsPage += 'instructions_random_2.html';
+                    node.game.quizPage += 'quiz_random.html'
+                }
+                else if (node.game.roomType === 'exo_perfect') {
+                    node.game.instructionsPage += 'instructions_exo_perfect_2.html';
+                    node.game.quizPage += 'quiz_exo_perfect.html'
+                }
+                else {
+                    node.game.instructionsPage += 'instructions_exo_lowhigh_2.html';
+                    node.game.quizPage += 'quiz_exo_lowhigh.html';
+                }     
+            }
         }
 
         // Hide the waiting for other players message.
@@ -833,7 +854,8 @@ module.exports = function(gameRoom, treatmentName, settings) {
     game.env = {
         auto: settings.AUTO,
         INITIAL_COINS: settings.INITIAL_COINS,
-        roomType: treatmentName
+        roomType: treatmentName,
+        part: settings.part
     };
     game.verbosity = 100;
   
