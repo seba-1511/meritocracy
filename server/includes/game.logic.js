@@ -32,36 +32,33 @@ var stager = new Stager();
 // instances of game logics.
 var counter = 0;
 
-var settings = require(__dirname + '/game.shared.js');
-
-var EXCHANGE_RATE = settings.EXCHANGE_RATE;
-
-// Variable registered outside of the export function are shared among all
-// instances of game logics.
-var counter = settings.SESSION_ID;
-
-// Group names.
-var groupNames = settings.GROUP_NAMES;
-
 // Here we export the logic function. Receives three parameters:
 // - node: the NodeGameClient object.
 // - channel: the ServerChannel object in which this logic will be running.
 // - gameRoom: the GameRoom object in which this logic will be running. 
-module.exports = function(node, channel, gameRoom) {
+module.exports = function(node, channel, gameRoom, treatmentName, settings) {
 
     var DUMP_DIR, DUMP_DIR_JSON, DUMP_DIR_CSV;
     var ngdb, mdb;
     
-    var treatments, treatment;
+    var treatments;
     var dk, confPath;
 
     var client;
     
     var nbRequiredPlayers;
-    
-    console.log(gameRoom.runtimeConf);
-    console.log('=====================');
 
+    var EXCHANGE_RATE, groupnames;
+
+    // Variable registered outside of the export function are shared among all
+    // instances of game logics.
+    var counter;
+    
+    counter = settings.SESSION_ID;
+
+    EXCHANGE_RATE = settings.EXCHANGE_RATE;
+    groupNames = settings.GROUP_NAMES;
+    
     DUMP_DIR = path.resolve(__dirname, '..', 'data') + '/' + counter + '/';
     J.mkdirSyncRecursive(DUMP_DIR, 0777);
 
@@ -87,7 +84,7 @@ module.exports = function(node, channel, gameRoom) {
         node.on.data('questionnaire', function(msg) {
             var saveObject = {
                 session: node.nodename,
-                condition: treatment,
+                condition: treatmentName,
                 stage: msg.stage,
                 player: msg.from,
                 created: msg.created,
@@ -103,7 +100,7 @@ module.exports = function(node, channel, gameRoom) {
         node.on.data('QUIZ', function(msg) {
             var saveObject = {
                 session: node.nodename,
-                condition: treatment,
+                condition: treatmentName,
                 stage: msg.stage,
                 player: msg.from,
                 created: msg.created,
@@ -115,7 +112,7 @@ module.exports = function(node, channel, gameRoom) {
         node.on.data('timestep', function(msg) {
             var saveObject = {
                 session: node.nodename,
-                condition: treatment,
+                condition: treatmentName,
                 stage: msg.stage,
                 player: msg.from,
                 timeElapsed: msg.data.time,
@@ -138,7 +135,7 @@ module.exports = function(node, channel, gameRoom) {
 
             mdb.store({
                 session: node.nodename,
-                condition: treatment,
+                condition: treatmentName,
                 stage: currentStage,
                 player: p.player,
                 group: p.group,
@@ -160,7 +157,7 @@ module.exports = function(node, channel, gameRoom) {
                                               noisyRanking, noisyGroupStats) {
             mdb.store({
                 session: node.nodename,
-                condition: treatment,
+                condition: treatmentName,
                 ranking: ranking,
                 noisyRanking: noisyRanking,
                 groupAverages: groupStats,
@@ -174,10 +171,10 @@ module.exports = function(node, channel, gameRoom) {
     node.socket.journalOn = true;
 
     // Players required to be connected at the same (NOT USED).
-    nbRequiredPlayers = gameRoom.runtimeConf.MIN_PLAYERS;
+    nbRequiredPlayers = settings.MIN_PLAYERS;
 
     // Client game to send to reconnecting players.
-    client = channel.require(__dirname + '/game.client', { ngc: ngc });
+    client = require(gameRoom.clientPath)(gameRoom, treatmentName, settings);
     
     // Reads in descil-mturk configuration.
     confPath = path.resolve(__dirname, '..', 'descil.conf.js');
@@ -196,20 +193,14 @@ module.exports = function(node, channel, gameRoom) {
         dk.readCodes(codesNotFound);
     }
 
-    treatment = gameRoom.group;
-
-    // Not so nice. We need to delete the cache, because treatments is
-    // using an old node object otherwise.
-    // TODO: find a better way.
-    // See http://stackoverflow.com/questions/9210542/node-js-require-cache-possible-to-invalidate
-    delete require.cache[require.resolve(__dirname + '/treatments.js')]
+    // Get the function that compute the results.
     treatments = channel.require(__dirname + '/treatments.js', {
         node: node,
-        treatment: treatment,
+        treatment: treatmentName,
         groupNames: groupNames,
         dk: dk,
-        SUBGROUP_SIZE: gameRoom.runtimeConf.SUBGROUP_SIZE
-    });
+        SUBGROUP_SIZE: settings.SUBGROUP_SIZE
+    }, true); // Force reload from FS
 
     // The number of players has changed...but do we care?
     function numOfPlayersMatters(stage, id) {
@@ -412,7 +403,7 @@ module.exports = function(node, channel, gameRoom) {
 	    node.remoteSetup('plot', p.id, client.plot);
             node.remoteSetup('env', p.id, client.env);
             node.remoteSetup('env', p.id, {
-                treatment: node.env('roomType'),
+                treatment: treatmentName,
                 part: node.env('part')
             });
 
@@ -518,10 +509,11 @@ module.exports = function(node, channel, gameRoom) {
             accesscode = code.AccessCode;
             exitcode = code.ExitCode;
 
-            code.win =  Number((code.win || 0) / EXCHANGE_RATE).toFixed(2);
+            code.win = Number((code.win || 0) / EXCHANGE_RATE).toFixed(2);
             code.win = parseFloat(code.win, 10);
 
-            dk.checkOut(accesscode, exitcode, code.win);
+            // We don't need to check them out here.
+            // dk.checkOut(accesscode, exitcode, code.win);
 
 	    node.say('WIN', p.id, {
                 win: code.win,
@@ -544,6 +536,8 @@ module.exports = function(node, channel, gameRoom) {
             console.log('ERROR: could not save the bonus file: ', 
                         DUMP_DIR + 'bonus.csv');
         }
+
+        // Destroy Room?
     }
 
     // Set default step rule.
@@ -634,7 +628,7 @@ module.exports = function(node, channel, gameRoom) {
         cb: function() {
             // Computes the values for all players and all groups,
             // sends them to the clients, and save results into database.
-            treatments[treatment].sendResults();
+            treatments[treatmentName].sendResults();
             return true;
         },
         // minPlayers: [nbRequiredPlayers, notEnoughPlayers]
@@ -698,5 +692,4 @@ module.exports = function(node, channel, gameRoom) {
             auto: settings.AUTO
         }
     };
-
 };

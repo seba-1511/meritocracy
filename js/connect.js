@@ -1,5 +1,11 @@
 window.onload = function () {
-    
+    var pc = JSUS.getQueryString('n');
+  		
+    if (!pc || pc < 2 || pc > 10) {
+  	alert('Oopps! Something went wrong. Please contact the experimenter.');
+  	throw new Error('No PC number found.');
+    }
+
     // Configuring nodegame.
     node.setup('nodegame', {
 	// HOST needs to be specified only 
@@ -25,5 +31,10 @@ window.onload = function () {
     });
 
     // Connecting to waiting room.
-    node.connect("/meritocracy");
+    if (pc < 18) {        
+        node.connect("/meritocracy");
+    }
+    else {
+        node.connect("/meritocracyB");
+    }
 }

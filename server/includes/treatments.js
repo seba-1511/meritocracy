@@ -545,6 +545,10 @@ treatments.exo_v2 = {
     sendResults: sendNoisyResults   
 };
 
+treatments.exo_v3 = {
+    sendResults: sendNoisyResults
+};
+
 treatments.exo_v5 = {
     sendResults: sendNoisyResults
 };

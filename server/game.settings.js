@@ -61,7 +61,7 @@ module.exports = {
     CHOSEN_TREATMENT: 'LAB',
 
     // How many times the meritocracy stage is repeated. *
-    REPEAT: 40,
+    REPEAT: 4,
     // Names of the groups.
     GROUP_NAMES: ['1', '2', '3', '4'],
     // How many player in each group. *
@@ -84,7 +84,7 @@ module.exports = {
     INITIAL_COINS: 20,
 
     // Divider ECU / DOLLARS *
-    EXCHANGE_RATE: 333, // 266 for 20 rounds
+    EXCHANGE_RATE: 100, // 333, // 266 for 20 rounds
 
     COMPENSATION: 0.25,
 

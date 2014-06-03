@@ -375,17 +375,14 @@ module.exports = function(gameRoom, treatmentName, settings) {
             if (msg.from !== '[ADMIN_SERVER]') return;
 
             node.game.pause();
-            W.lockScreen('One player disconnected. We are now waiting to see if ' +
-                         'he or she reconnects. If not, the game will continue ' +
-                         'with fewer players.');
+            W.lockScreen('One player disconnected. We are now waiting to see ' +
+                         'if he or she reconnects. If not, the game will ' +
+                         'continue with fewer players.');
         });
 
         node.on('SOCKET_DISCONNECT', function() {
-            alert('Connection with the server was terminated. If you think ' +
-                  'this is an error, please try to refresh the page. You can ' +
-                  'also look for a HIT called ETH Descil Trouble Ticket for ' +
-                  'Decision Making Study and file an error report. Thank you ' +
-                  'for your collaboration.');
+            alert('Connection with the server was terminated. Please ' +
+                  'contact the experimenter.');
         });
 
     });
@@ -564,15 +561,37 @@ module.exports = function(gameRoom, treatmentName, settings) {
 
     function endgame() {
         W.loadFrame('/meritocracy/html/ended.html', function() {
+            var timer;
+
 	    node.game.timer.setToZero();
+            // Remove Socket Disconnect event listener.
+            // Client will be redirected by the server.
+            node.off('SOCKET_DISCONNECT');
             node.on.data('WIN', function(msg) {
                 var win, exitcode, codeErr;
                 codeErr = 'ERROR (code not found)';
                 win = msg.data && msg.data.win || 0;
                 exitcode = msg.data && msg.data.exitcode || codeErr;
-	        W.writeln('Your bonus in this game is: ' + win);
-                W.writeln('Your exitcode is: ' + exitcode);
+                
+                if (node.env('part') == 1) {
+	            W.writeln('Your payoff so far is: ' + win + ' CHF.');
+                }
+                else {
+                    W.writeln('Your total payoff in this game is: ' + win +
+                              ' CHF.');
+                }
+                // W.writeln('Your exitcode is: ' + exitcode);
 	    });
+            if (node.env('part') == 1) {
+                // Redirect to game room.
+                timer = node.timer.createTimer({
+                    milliseconds: 10000,
+                    timeup: function() {
+                        location.reload();
+                    }
+                });
+                timer.start();
+            }
         });
 
         console.log('Game ended');

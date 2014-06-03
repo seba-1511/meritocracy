@@ -4,15 +4,38 @@
 <link rel="stylesheet" type="text/css" href="css/style.css">
 <body>
   <div id="root">
-    <h1>THANK YOU FOR PLAYING.</h1>
-    Please go back to the Amazon Mechanical Turk web site and submit the hit.
+    <h1 id="h1title"></h1>
+    <span id="subtitle"></span>
     <br/>
-    We usually pay within 24 hours. For any problem, please look for a HIT called <strong>ETH Descil Trouble Ticket for Decision Making Study</strong> and file a new trouble ticket reporting the following information:
-    <ul>
-      <li>your turker id</li>
-      <li>your exit code, as written below</li>
-      <li>your browser name and version</li>
-    </ul>
-    <br/> Notice: you do not need the exit code to submit the HIT, but only in case of trouble with the payment.
   </div>
 </body>
+<script type="text/javascript">
+  var part, subtitle, h1title;
+  part = parent.node.env('part');
+  h1title = document.getElementById('h1title');
+  subtitle = document.getElementById('subtitle');
+  if (part == 1) {
+      h1title.innerHTML = 'You have completed successfully Part 1. of the experiment';
+      subtitle.innerHTML = 'The second part will start soon.';
+  }
+  else {
+      h1title.innerHTML = 'Thank you for taking part in the experiment';
+      subtitle.innerHTML = 'Please wait for your number to be called.';
+  }
+//   if (roomType === 'exo_low') {
+//     variance = document.getElementById('variance');
+//     variance.innerHTML = 4;
+//   }
+//   else if (roomType === 'exo_lowlow') {
+//     variance = document.getElementById('variance');
+//     variance.innerHTML = 20;
+//   }
+//   else if (roomType === 'exo_extralow') {
+//     variance = document.getElementById('variance');
+//     variance.innerHTML = 100;
+//   }
+//   else if (roomType === 'exo_minor') {
+//     variance = document.getElementById('variance');
+//     variance.innerHTML = 1000;
+//   }
+</script>
