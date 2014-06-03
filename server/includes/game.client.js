@@ -42,7 +42,6 @@ module.exports = function(gameRoom, treatmentName, settings) {
         // Regular expression to detect integers in contributions.
         intRegex = /^\d+$/;
 
-
         console.log('INIT PLAYER!');
         
         node.game.INITIAL_COINS = node.env('INITIAL_COINS');
@@ -53,6 +52,11 @@ module.exports = function(gameRoom, treatmentName, settings) {
 
         // Change so that roomtype is set as decided in game.room.
         node.game.roomType = node.env('roomType');
+
+        if (!node.game.roomType) {
+            alert('Missconfigured Game: missing roomType.');
+            throw new Error('Missconfigured Game: missing roomType.');
+        }
 
         // Adapting the game to the treatment.
         node.game.instructionsPage = '/meritocracy/html/';
@@ -828,9 +832,10 @@ module.exports = function(gameRoom, treatmentName, settings) {
     };
     game.env = {
         auto: settings.AUTO,
-        INITIAL_COINS: settings.INITIAL_COINS
+        INITIAL_COINS: settings.INITIAL_COINS,
+        roomType: treatmentName
     };
     game.verbosity = 100;
-
+  
     return game;
 };

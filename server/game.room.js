@@ -37,7 +37,7 @@ module.exports = function(node, channel, room) {
         dk.readCodes(codesNotFound);
     }
 
-    
+
     // Set first treatment to true. Each Group plays two treatments.
     room.firstTreatment = true;
 
@@ -102,7 +102,7 @@ module.exports = function(node, channel, room) {
                     treatment = room.firstTreatment ? 'exo_v20' : 'exo_v3';
                 }
                 break;
-            
+
             case 2:
                 if (channel.name === 'MERIT_A') {
                     treatment = room.firstTreatment ? 'random' : 'exo_perfect';
@@ -111,8 +111,8 @@ module.exports = function(node, channel, room) {
                     treatment = room.firstTreatment ? 'exo_v3' : 'exo_v20';
                 }
                 break;
-                
-             
+
+
             case 3:
                 if (channel.name === 'MERIT_A') {
                     treatment = room.firstTreatment ? 'exo_perfect' : 'exo_v20';
@@ -493,7 +493,7 @@ module.exports = function(node, channel, room) {
                     gameName: 'meritocracy',
                     group: assignedRoom.name,
                     clients: tmpPlayerList,
-                    runtimeConf: runtimeConf                    
+                    runtimeConf: runtimeConf
                 });
 
 

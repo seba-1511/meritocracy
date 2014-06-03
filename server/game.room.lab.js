@@ -125,6 +125,7 @@ module.exports = function(node, channel, room) {
                 // the new room
                 gameRoom = channel.createGameRoom({
                     gameName: 'meritocracy',
+                    treatmentName: assignedRoom.name,
                     group: assignedRoom.name,
                     clients: tmpPlayerList,
                     runtimeConf: runtimeConf                    

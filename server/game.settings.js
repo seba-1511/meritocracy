@@ -92,7 +92,7 @@ module.exports = {
     DEBUG: true,
 
     // AUTO-PLAY.
-    AUTO: false,
+    AUTO: true,
 
     // DATABASE.
     DB: 'FILE', // FILE, MONGODB
@@ -104,25 +104,21 @@ module.exports = {
     treatments: {
 
         exo_perfect: {
-            name: "exo_perfect",
             fullName: "Perfect Meritocracy",
             description: "Zero variance for perfect meritocracy."
         },
         
         exo_v3: {
-            name: "exo_v3",
             fullName: "High Meritocracy V3",
             description: "Low level of variance for a high level of meritocracy.",
         },
 
         exo_v20: {
-            name: "exo_v20",
             fullName: "Low Meritocracy V20",
             description: "High level of variance for a low level of meritocracy."
         },
 
         random: {
-            name: "random",
             fullName: "Random",
             description: "Completely random matching for no meritocracy."
         }
