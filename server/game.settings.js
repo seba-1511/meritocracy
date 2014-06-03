@@ -61,7 +61,7 @@ module.exports = {
     CHOSEN_TREATMENT: 'LAB',
 
     // How many times the meritocracy stage is repeated. *
-    REPEAT: 25,
+    REPEAT: 40,
     // Names of the groups.
     GROUP_NAMES: ['1', '2', '3', '4'],
     // How many player in each group. *
