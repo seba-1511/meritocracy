@@ -1,6 +1,6 @@
 /**
  * # ChannelList widget for nodeGame
- * Copyright(c) 2013 Stefano Balietti
+ * Copyright(c) 2014 Stefano Balietti
  * MIT Licensed
  *
  * Shows current, previous and next state.
@@ -15,21 +15,15 @@
     node.widgets.register('ChannelList', ChannelList);
 
     var JSUS = node.JSUS,
-    Table = node.window.Table;
-
-    // ## Defaults
-
-    ChannelList.defaults = {};
-    ChannelList.defaults.id = 'channellist';
-    ChannelList.defaults.fieldset = {
-        legend: 'Channels',
-        id: 'channellist_fieldset'
-    };
+        Table = node.window.Table;
 
     // ## Meta-data
 
     ChannelList.version = '0.1.0';
-    ChannelList.description = 'Display all channels on the server.';
+    ChannelList.description = 'Visually display all channels on the server.';
+
+    ChannelList.title = 'Channels';
+    ChannelList.className = 'channellist';
 
     // ## Dependencies
 
@@ -72,7 +66,8 @@
             textElem = document.createElement('span');
             textElem.appendChild(document.createTextNode(text));
             textElem.onclick = function() {
-                alert(content.name);
+                // Signal the RoomList to switch channels:
+                node.emit('USECHANNEL', content.name);
             };
 
             if (o.x >= 2) {  // number of clients/players/admins
@@ -89,7 +84,6 @@
     function ChannelList(options) {
         this.id = options.id;
 
-        this.root = null;
         this.table = new Table({
             render: {
                 pipeline: renderCell,
@@ -102,13 +96,7 @@
                               '# Clients', '# Players', '# Admins']);
     }
 
-    ChannelList.prototype.getRoot = function() {
-        return this.root;
-    };
-
-    ChannelList.prototype.append = function(root, ids) {
-        root.appendChild(this.table.table);
-
+    ChannelList.prototype.refresh = function() {
         // Ask server for channel list:
         node.socket.send(node.msg.create({
             target: 'SERVERCOMMAND',
@@ -120,8 +108,13 @@
         }));
 
         this.table.parse();
+    };
 
-        return root;
+    ChannelList.prototype.append = function() {
+        this.bodyDiv.appendChild(this.table.table);
+
+        // Query server:
+        this.refresh();
     };
 
     ChannelList.prototype.listeners = function() {
@@ -129,6 +122,7 @@
 
         that = this;
 
+        // Listen for server reply:
         node.on.data('INFO_CHANNELS', function(msg) {
             that.writeChannels(msg.data);
         });

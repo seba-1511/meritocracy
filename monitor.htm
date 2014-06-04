@@ -5,8 +5,13 @@
 <script src="/socket.io/socket.io.js"></script>
 <script src="/javascripts/nodegame-full.js" charset="utf-8"></script>
 <script src="./js/ChannelList.js" charset="utf-8"></script>
-<script src="./js/monitor.js" charset="utf-8"></script>
+<script src="./js/RoomList.js" charset="utf-8"></script>
+<script src="./js/ClientList.js" charset="utf-8"></script>
+<script src="./js/GameList.js" charset="utf-8"></script>
+<script src="./js/Monitor.js" charset="utf-8"></script>
+<link rel='stylesheet' href='/stylesheets/nodegame.css'></link>
 <link rel='stylesheet' href='/stylesheets/monitor.css'></link>
+<link rel='stylesheet' href='./html/css/bootstrap.min.css'></link>
 
 <script>
     window.onload = function() {
@@ -27,8 +32,6 @@
     JSUS.mixin(conf, game);
 
     node.setup('nodegame', conf);
-   
-    //node.socket.setSocketType('SocketIo');
     
     node.connect(conf.url);
     node.once('PLAYER_CREATED', function(player) {
