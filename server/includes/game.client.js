@@ -368,16 +368,6 @@ module.exports = function(gameRoom, treatmentName, settings) {
         node.on('STEPPING', function() {
             W.clearFrame();
         });
-
-        // Lock / Unlock screen on pause/resume.
-        node.on('PAUSED', function() {
-            W.lockScreen('Game is paused. Please wait.');
-        });
-        node.on('RESUMED', function() {
-            if (W.isScreenLocked()) {
-                W.unlockScreen();
-            }
-        });
       
         node.on.data('notEnoughPlayers', function(msg) {
             // Not yet 100% safe. Some players could forge the from field.
