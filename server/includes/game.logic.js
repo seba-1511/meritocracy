@@ -510,19 +510,21 @@ module.exports = function(node, channel, gameRoom, treatmentName, settings) {
             accesscode = code.AccessCode;
             exitcode = code.ExitCode;
 
-            code.win = Number((code.win || 0) / EXCHANGE_RATE).toFixed(2);
-            code.win = parseFloat(code.win, 10);
+            // Update total real money won.
+            code.winReal = (code.winReal || 0) + 
+                parseFloat(Number((code.win || 0) / EXCHANGE_RATE).toFixed(2), 10);
+            code.winReal = parseFloat(code.winReal, 10);
 
             // We don't need to check them out here.
             // dk.checkOut(accesscode, exitcode, code.win);
 
 	    node.say('WIN', p.id, {
-                win: code.win,
+                win: code.winReal.toFixed(2),
                 exitcode: code.ExitCode
             });
 
-            console.log(p.id, ': ',  code.win, code.ExitCode);
-            return [p.id, code.ExitCode, code.win, node.game.gameTerminated];
+            console.log(p.id, ': ',  code.winReal, code.ExitCode);
+            return [p.id, code.ExitCode, code.winReal, node.game.gameTerminated];
         });
 
         console.log('***********************');

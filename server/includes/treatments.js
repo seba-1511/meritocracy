@@ -142,7 +142,7 @@ function endoGroupMatching(sortedContribs) {
     bars = [];
     ranking = [];
     compatibility = [];
-    
+
     gId = -1;
     len = sortedContribs.length;
     limit = len - SUBGROUP_SIZE;
@@ -172,15 +172,15 @@ function endoGroupMatching(sortedContribs) {
         for (j = (i + 1); j < len; j++) {
             // Check this entry.
             entryJ = sortedContribs[j];
-            if (alreadyTaken[entryJ.player]) continue;            
+            if (alreadyTaken[entryJ.player]) continue;
 
 
             // Since contributions are sorted we don't check further.
-            if (entryJ.value.contribution < temp.maxDemand) {          
+            if (entryJ.value.contribution < temp.maxDemand) {
                 noGroup.push(entryI);
                 break;
             }
-            
+
             // Entry is compatible.
             if (entryJ.value.demand <= temp.minContrib) {
 
@@ -189,8 +189,8 @@ function endoGroupMatching(sortedContribs) {
                 temp.ranking.push(entryJ.player);
                 temp.bars.push([entryJ.value.contribution, entryJ.value.demand]);
 
-                // Update requirements for the group.                
-                temp.minContrib = Math.min(temp.minContrib, 
+                // Update requirements for the group.
+                temp.minContrib = Math.min(temp.minContrib,
                                            entryJ.value.contribution);
                 temp.maxDemand = Math.max(temp.maxDemand, entryJ.value.demand);
 
@@ -204,30 +204,30 @@ function endoGroupMatching(sortedContribs) {
                     ranking = ranking.concat(temp.ranking);
                     bars.push(temp.bars);
                     compatibility[gId] = 1;
-                    
+
                     // Mark all entries as taken.
                     for (j = 0; j < SUBGROUP_SIZE; j++) {
                         entryJ = temp.groups[j];
                         alreadyTaken[entryJ.player] = entryJ.player;
                         entryJ.group = groupNames[gId];
-                    }                
+                    }
                     break;
                 }
-                
+
             }
-            
+
             // We don't have enough players left to try to complete the group.
             else if ((len - (j+1)) < (SUBGROUP_SIZE - temp.groups.length)) {
                 // Mark entryI as without group.
                 noGroup.push(entryI);
                 break;
             }
-        }        
+        }
     }
-    
+
     if (noGroup.length) {
         // Creating random groups from entries in no group.
-        noGroup = J.shuffle(noGroup);        
+        noGroup = J.shuffle(noGroup);
         for (i = 0; i < noGroup.length; i++) {
             if (i % SUBGROUP_SIZE == 0) {
                 ++gId;
@@ -287,7 +287,7 @@ function computeGroupStats(groups) {
 
         out[groupName] = {
             avgContr: cSum / lenJ,
-            stdContr: df <= 1 ? 'NA' : 
+            stdContr: df <= 1 ? 'NA' :
                 Math.sqrt((cSumSquared - (Math.pow(cSum, 2) / lenJ)) / df)
         };
 
@@ -354,7 +354,7 @@ function finalizeRound(currentStage, bars,
 
     console.log(noisyGroups.length);
     console.log('!!!!!');
-    
+
     allPayoffs = [];
     allPositions = [];
 
@@ -363,10 +363,10 @@ function finalizeRound(currentStage, bars,
     for (; ++i < len;) {
         j = -1, lenJ = noisyGroups[i].length;
         allPayoffs.push([]);
-        
+
         console.log(noisyGroups[i].length);
         console.log('======');
-        
+
         for (; ++j < lenJ;) {
             contribObj = noisyGroups[i][j];
 
@@ -375,20 +375,20 @@ function finalizeRound(currentStage, bars,
             allPositions.push(positionInNoisyRank);
 
             pId = contribObj.player;
-            
+
             playerPayoff = getPayoff(bars, positionInNoisyRank);
-            
-            allPayoffs[i].push(playerPayoff);            
-            
+
+            allPayoffs[i].push(playerPayoff);
+
             // Updating the player database with the current payoff.
             code = dk.codes.id.get(pId);
             if (!code) {
-                console.log('AAAH code not found: ', pId);                
-            }	   
+                console.log('AAAH code not found: ', pId);
+            }
             code.win = !code.win ? playerPayoff : code.win + playerPayoff;
 	    console.log('Added to ' + pId + ' ' + playerPayoff + ' ECU');
             // End Update.
-            
+
             if (settings.DB === 'MONGODB') {
                 node.game.savePlayerValues(contribObj, playerPayoff,
                                            positionInNoisyRank,
@@ -407,7 +407,7 @@ function finalizeRound(currentStage, bars,
 }
 
 // // Removes duplicates in case of reconnections.
-// function merge(arr) {    
+// function merge(arr) {
 //    for(var o = {}, i; i=arr.shift(); o[i.player] = i.count + (o[i.player] || 0));
 //    for(i in o) arr.push({name:i, count:o[i]});
 // }
@@ -486,7 +486,7 @@ treatments.exo_perfect = {
 
         receivedData = node.game.memory.stage[previousStage]
             .selexec('key', '=', 'bid');
-        
+
         // If a player submitted twice with reconnections.
 
         var i, len, o = {}, c, newSize = 0;
@@ -542,7 +542,7 @@ treatments.exo_perfect = {
 
 
 treatments.exo_v2 = {
-    sendResults: sendNoisyResults   
+    sendResults: sendNoisyResults
 };
 
 treatments.exo_v3 = {
@@ -736,7 +736,7 @@ function getGroupsPlayerBars(player, receivedData, p, groupValues) {
     player = [player.value.contribution, player.value.demand];
 
     allPlayers = receivedData.selexec('group', '=', p.group).fetch();
-    
+
     playersBars.push(player);
     for (player in allPlayers) {
         player = allPlayers[player];

@@ -15,7 +15,7 @@ module.exports = function(node, channel, room) {
     // Load Meritocracy settings;
     var gameInfo = channel.servernode.getGamesInfo('meritocracy');
     var settings = gameInfo.treatments.standard;
-    
+
     // Set first treatment to true. Each group plays two treatments.
     room.firstTreatment = true;
 
@@ -31,7 +31,7 @@ module.exports = function(node, channel, room) {
     var Database = require('nodegame-db').Database;
     var ngdb = new Database(node);
     var mdb = ngdb.getLayer('MongoDB');
-    
+
     // Decide Room function.
     var decideRoom = require(__dirname + '/includes/decide.treatments.js');
 
@@ -103,8 +103,7 @@ module.exports = function(node, channel, room) {
             nPlayers = wRoom.size();
 
             console.log('-----------We have enough players: ' + nPlayers);
-            
-            debugger
+
             runtimeConf = adjustGameSettings(nPlayers);
 
             totalGroupSize = runtimeConf.GROUP_SIZE +
@@ -117,7 +116,7 @@ module.exports = function(node, channel, room) {
                 tmpPlayerList = wRoom.shuffle().limit(totalGroupSize);
 
                 //Assigning a game room to this list of players
-                assignedRoom = decideRoom(channel, room, gameInfo, 
+                assignedRoom = decideRoom(channel, room, gameInfo,
                                           settings.CHOSEN_TREATMENT);
 
                 // Creating a sub gaming room.
@@ -128,7 +127,7 @@ module.exports = function(node, channel, room) {
                     treatmentName: assignedRoom.name,
                     group: assignedRoom.name,
                     clients: tmpPlayerList,
-                    runtimeConf: runtimeConf                    
+                    runtimeConf: runtimeConf
                 });
 
                 gameRoom.setupGame();
