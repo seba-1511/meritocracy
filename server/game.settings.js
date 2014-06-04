@@ -61,7 +61,7 @@ module.exports = {
     CHOSEN_TREATMENT: 'LAB',
 
     // How many times the meritocracy stage is repeated. *
-    REPEAT: 4,
+    REPEAT: 2,
     // Names of the groups.
     GROUP_NAMES: ['1', '2', '3', '4'],
     // How many player in each group. *
@@ -98,7 +98,7 @@ module.exports = {
     DB: 'FILE', // FILE, MONGODB
 
     // AUTHORIZATION.
-    AUTH: 'NO', // MTURK, LOCAL, NO.
+    AUTH: 'LOCAL', // MTURK, LOCAL, NO.
 
 
     treatments: {

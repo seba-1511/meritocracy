@@ -11,6 +11,7 @@ module.exports = {
 };
 
 var path = require('path');
+var J = require('JSUS').JSUS;
 var descilConfPath, settings, dk;
 
 settings = module.parent.exports.settings;
@@ -30,15 +31,16 @@ dk.readCodes(codesNotFound);
 
 // Creating an authorization function for the players.
 // This is executed before the client the PCONNECT listener.
-function authorization(header, cookies, roomName) {
+function authorization(headers, cookies, roomName) {
+    var pc;
     // settings is defined inside game.room.
     if (settings.AUTH === 'NO') {
         return true;
     }
 
-    if (!cookies || !cookies.pc) {
-        console.log('Player connected without cookies.pc.');
-        console.log(header);
+    pc = J.getQueryString('n', headers.referer);
+    if (pc < 2 || pc > 40) {
+        console.log('Player connected without pc header.');
         return false;
     }
     // Client Authorized
@@ -48,9 +50,12 @@ function authorization(header, cookies, roomName) {
 
 // Assigns Player Ids based on cookie token. Must return a string.
 function clientIdGenerator(headers, cookies, validCookie, ids, info) {
+    var cid;
     if (settings.AUTH === 'NO') {
         code = dk.codes.db[++room.noAuthCounter].AccessCode;
         return code;
     }
-    return '' + cookies.pc;
+    cid = J.getQueryString('n', headers.referer);
+    return ('undefined' === typeof ids[cid] || ids[cid].disconnected) ? 
+        cid : false;
 }

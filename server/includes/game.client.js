@@ -582,16 +582,19 @@ module.exports = function(gameRoom, treatmentName, settings) {
                 }
                 // W.writeln('Your exitcode is: ' + exitcode);
 	    });
-            if (node.env('part') == 1) {
-                // Redirect to game room.
-                timer = node.timer.createTimer({
-                    milliseconds: 10000,
-                    timeup: function() {
-                        location.reload();
-                    }
-                });
-                timer.start();
-            }
+//             if (node.env('part') == 1) {
+//                 // Redirect to game room.
+//                 timer = node.timer.createTimer({
+//                     milliseconds: 10000,
+//                     timeup: function() {
+//                         // Delete player cookie and reconnect to start
+//                         // second part of the experiment.
+//                         node.store.cookie('player', null);
+//                         location.reload();
+//                     }
+//                 });
+//                 timer.start();
+//            }
         });
 
         console.log('Game ended');

@@ -490,6 +490,7 @@ module.exports = function(node, channel, gameRoom, treatmentName, settings) {
     function endgame() {
         var code, exitcode, accesscode;
         var bonusFile, bonus;
+        var playerIds;
 
         console.log('endgame');
         
@@ -537,7 +538,22 @@ module.exports = function(node, channel, gameRoom, treatmentName, settings) {
                         DUMP_DIR + 'bonus.csv');
         }
 
+        setTimeout(function() {
+            // Notify Waiting Room that first part is finished.
+            if (settings.part == 1) {
+                channel.waitingRoom.firstTreatment = false;
+
+                playerIds = node.game.pl.id.getAllKeys();
+                for (i in playerIds) {
+                    if (playerIds.hasOwnProperty(i)) {
+                        channel.movePlayer(playerIds[i], 
+                                           channel.waitingRoom.name);
+                    }
+                }
+            }
+        }, 4000);
         // Destroy Room?
+        
     }
 
     // Set default step rule.

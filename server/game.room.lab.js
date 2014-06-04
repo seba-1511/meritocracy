@@ -103,7 +103,8 @@ module.exports = function(node, channel, room) {
             nPlayers = wRoom.size();
 
             console.log('-----------We have enough players: ' + nPlayers);
-
+            
+            debugger
             runtimeConf = adjustGameSettings(nPlayers);
 
             totalGroupSize = runtimeConf.GROUP_SIZE +
