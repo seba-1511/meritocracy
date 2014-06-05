@@ -649,7 +649,7 @@ module.exports = function(gameRoom, treatmentName, settings) {
         cb: instructions,
         // minPlayers: [nbRequiredPlayers, notEnoughPlayers],
         // syncOnLoaded: true,
-        timer: 180000,
+        timer: settings.timer["instructions" + settings.part],
         done: clearFrame
     });
 
@@ -665,7 +665,7 @@ module.exports = function(gameRoom, treatmentName, settings) {
         //  - an object containing properties _milliseconds_, and _timeup_
         //     the latter being the name of the event to fire (default DONE)
         // - or a function returning the number of milliseconds.
-        timer: 120000,
+        timer: settings.timer.quiz,
         done: function() {
             console.log('EXECUTING DONE HANDLER!!');
             node.set('QUIZ', node.game.quizResults);
@@ -691,10 +691,7 @@ module.exports = function(gameRoom, treatmentName, settings) {
         cb: bid,
         done: clearFrame,
         timer: {
-	    milliseconds: function() {
-	        if (node.game.getCurrentGameStage().round < 3) return 30000;
-	        return 15000;
-	    },
+	    milliseconds: settings.timer.bid,
             timeup: 'TIMEUP'
         }
     });
@@ -702,13 +699,7 @@ module.exports = function(gameRoom, treatmentName, settings) {
     stager.addStep({
         id: 'results',
         cb: showResults,
-        timer: function() {
-            var round;
-            round = node.game.getCurrentGameStage().round;
-	    if (round < 2) return 60000;
-	    if (round < 3) return 50000;
-	    return 30000;        
-        },
+        timer: settings.timer.results,
         done: clearFrame
     });
 
@@ -738,7 +729,7 @@ module.exports = function(gameRoom, treatmentName, settings) {
     stager.addStage({
         id: 'questionnaire',
         cb: postgame,
-        timer: 120000,
+        timer: settings.timer.questionnaire,
         done: function() {
             var i, socExpValue, stratChoiceValue;
             T = W.getFrameDocument(),

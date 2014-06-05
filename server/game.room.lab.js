@@ -71,7 +71,7 @@ module.exports = function(node, channel, room) {
             // Wait to have enough clients connected.
             if (nPlayers >= POOL_SIZE) {
                 node.timer.createTimer({
-                    milliseconds: 30000,
+                    milliseconds: settings.timer.dispatch,
                     timeup: 'DISPATCH'
                 }).start();
             }

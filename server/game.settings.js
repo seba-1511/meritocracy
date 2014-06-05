@@ -15,7 +15,7 @@ module.exports = {
 
     // Waiting Room Settings. *
     ////////////////////////////
-    
+
     // How many sessions should be dispatched.
     TARGET_SESSIONS: 5,
 
@@ -72,7 +72,7 @@ module.exports = {
         exo_v2: 1.4142,
         exo_v3: 1.732051,
         exo_v5: 2.236068,
-        exo_v10: 3.162278,  
+        exo_v10: 3.162278,
         exo_v20: 4.472136,
         exo_v50: 7.071068,
         exo_v100: 10,
@@ -87,6 +87,28 @@ module.exports = {
     EXCHANGE_RATE: 100, // 333, // 266 for 20 rounds
 
     COMPENSATION: 0.25,
+
+    timer: {
+        instructions1: 300000,
+        instructions2: 180000,
+        quiz: 120000,
+        questionnaire: 180000,
+        bid: function() {
+	    if (node.game.getCurrentGameStage().round < 3) return 30000;
+	    return 15000;
+	},
+        results: function() {
+            var round;
+            round = node.game.getCurrentGameStage().round;
+	    if (round < 2) return 60000;
+	    if (round < 3) return 50000;
+	    return 30000;
+        },
+        // Logic
+        breakPart1: 20000,
+        // Waiting Room
+        dispatch: 30000
+    },
 
     // DEBUG.
     DEBUG: true,
@@ -107,7 +129,7 @@ module.exports = {
             fullName: "Perfect Meritocracy",
             description: "Zero variance for perfect meritocracy."
         },
-        
+
         exo_v3: {
             fullName: "High Meritocracy V3",
             description: "Low level of variance for a high level of meritocracy.",

@@ -563,7 +563,7 @@ module.exports = function(node, channel, gameRoom, treatmentName, settings) {
                     }
                 }
             }
-        }, 20000);
+        }, settings.timer.breakPart1);
         // Destroy Room?
         
     }
