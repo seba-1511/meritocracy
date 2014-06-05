@@ -95,7 +95,7 @@ module.exports = {
     AUTO: true,
 
     // DATABASE.
-    DB: 'FILE', // FILE, MONGODB
+    DB: 'MONGODB', // FILE, MONGODB
 
     // AUTHORIZATION.
     AUTH: 'LOCAL', // MTURK, LOCAL, NO.

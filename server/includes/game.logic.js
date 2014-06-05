@@ -52,15 +52,17 @@ module.exports = function(node, channel, gameRoom, treatmentName, settings) {
 
     // Variable registered outside of the export function are shared among all
     // instances of game logics.
-    var counter;
+    var counter, channelCode, exPart, uniqueSession;
     
     counter = settings.SESSION_ID;
+    channelCode = channel.name.charAt(channel.name.length-1);
+    exPart = settings.part;
+    uniqueSession =  counter + '_' + channelCode;
 
     EXCHANGE_RATE = settings.EXCHANGE_RATE;
     groupNames = settings.GROUP_NAMES;
     
-    DUMP_DIR = path.resolve(__dirname, '..', 'data') + '/' + counter + '_' + 
-        channel.name.charAt(channel.name.length-1) + '/';
+    DUMP_DIR = path.resolve(__dirname, '..', 'data') + '/' + uniqueSession + '/';
     
     J.mkdirSyncRecursive(DUMP_DIR, 0777);
 
@@ -78,14 +80,14 @@ module.exports = function(node, channel, gameRoom, treatmentName, settings) {
         ngdb = new Database(node);
         mdb = ngdb.getLayer('MongoDB', {
             dbName: 'meritocracy_db',
-            collectionName: 'user_data'
+            collectionName: 'lab'
         });
 
         mdb.connect(function() {});
 
         node.on.data('questionnaire', function(msg) {
             var saveObject = {
-                session: node.nodename,
+                session: uniqueSession,
                 condition: treatmentName,
                 stage: msg.stage,
                 player: msg.from,
@@ -94,31 +96,34 @@ module.exports = function(node, channel, gameRoom, treatmentName, settings) {
                 additionalComments: msg.data.comments,
                 alreadyParticipated: msg.data.socExp,
                 strategyChoice: msg.data.stratChoice,
-                strategyComments: msg.data.stratComment
+                strategyComments: msg.data.stratComment,
+                exPart: exPart
             };
             mdb.store(saveObject);
         });
 
         node.on.data('QUIZ', function(msg) {
             var saveObject = {
-                session: node.nodename,
+                session: uniqueSession,
                 condition: treatmentName,
                 stage: msg.stage,
                 player: msg.from,
                 created: msg.created,
-                quiz: msg.data
+                quiz: msg.data,
+                exPart: exPart
             };
             mdb.store(saveObject);
         });
 
         node.on.data('timestep', function(msg) {
             var saveObject = {
-                session: node.nodename,
+                session: uniqueSession,
                 condition: treatmentName,
                 stage: msg.stage,
                 player: msg.from,
                 timeElapsed: msg.data.time,
-                timeup: msg.data.timeup
+                timeup: msg.data.timeup,
+                exPart: exPart
             };
             mdb.store(saveObject);
         });
@@ -136,7 +141,7 @@ module.exports = function(node, channel, gameRoom, treatmentName, settings) {
             finalGroupStats = groupStats[groupNames[positionInNoisyRank[0]]];
 
             mdb.store({
-                session: node.nodename,
+                session: uniqueSession,
                 condition: treatmentName,
                 stage: currentStage,
                 player: p.player,
@@ -151,19 +156,21 @@ module.exports = function(node, channel, gameRoom, treatmentName, settings) {
                 groupStdDemand: finalGroupStats.stdDemand,
                 rankBeforeNoise: ranking.indexOf(p.id) + 1,
                 rankAfterNoise: noisyRanking.indexOf(p.id) + 1,
-                timeup: p.value.isTimeOut
+                timeup: p.value.isTimeOut,
+                exPart: exPart
             });
         };
 
         node.game.saveRoundResults = function(ranking, groupStats,
                                               noisyRanking, noisyGroupStats) {
             mdb.store({
-                session: node.nodename,
+                session: uniqueSession,
                 condition: treatmentName,
                 ranking: ranking,
                 noisyRanking: noisyRanking,
                 groupAverages: groupStats,
-                noisyGroupAverages: noisyGroupStats
+                noisyGroupAverages: noisyGroupStats,
+                exPart: exPart
             });
         };
     }
@@ -270,12 +277,13 @@ module.exports = function(node, channel, gameRoom, treatmentName, settings) {
                 }
             }
             
-            console.log(node.nodename, ' - Round:  ', currentStage);
+            console.log(uniqueSession, ' - Round:  ', currentStage);
         });
 
         // Add session name to data in DB.
         node.game.memory.on('insert', function(o) {
-            o.session = node.nodename;
+            o.session = uniqueSession;
+            o.exPart = exPart;
         });
 
         // Register player disconnection, and wait for him...
@@ -406,7 +414,7 @@ module.exports = function(node, channel, gameRoom, treatmentName, settings) {
             node.remoteSetup('env', p.id, client.env);
             node.remoteSetup('env', p.id, {
                 treatment: treatmentName,
-                part: node.env('part')
+                part: exPart
             });
 
 
@@ -544,7 +552,7 @@ module.exports = function(node, channel, gameRoom, treatmentName, settings) {
 
         setTimeout(function() {
             // Notify Waiting Room that first part is finished.
-            if (settings.part == 1) {
+            if (exPart == 1) {
                 channel.waitingRoom.firstTreatment = false;
 
                 playerIds = node.game.pl.id.getAllKeys();
@@ -686,7 +694,7 @@ module.exports = function(node, channel, gameRoom, treatmentName, settings) {
 
     // Here we group together the definition of the game logic.
     return {
-        nodename: 'lgc' + counter,
+        nodename: 'lgc_' + uniqueSession,
         game_metadata: {
             name: 'meritocracy',
             version: '0.0.1'
