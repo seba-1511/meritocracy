@@ -1,7 +1,7 @@
 window.onload = function () {
     var pc = JSUS.getQueryString('n');
     
-    if (!pc || pc < 2 || pc > 10) {
+    if (!pc || pc < 2 || pc > 40) {
   	alert('Oopps! Something went wrong. Please contact the experimenter.');
   	throw new Error('No PC number found.');
     }

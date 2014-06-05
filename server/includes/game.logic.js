@@ -59,7 +59,9 @@ module.exports = function(node, channel, gameRoom, treatmentName, settings) {
     EXCHANGE_RATE = settings.EXCHANGE_RATE;
     groupNames = settings.GROUP_NAMES;
     
-    DUMP_DIR = path.resolve(__dirname, '..', 'data') + '/' + counter + '/';
+    DUMP_DIR = path.resolve(__dirname, '..', 'data') + '/' + counter + '_' + 
+        channel.name.charAt(channel.name.length-1) + '/';
+    
     J.mkdirSyncRecursive(DUMP_DIR, 0777);
 
     // Preparing storage: FILE or MONGODB.
