@@ -573,27 +573,14 @@ module.exports = function(gameRoom, treatmentName, settings) {
                 exitcode = msg.data && msg.data.exitcode || codeErr;
                 
                 if (node.env('part') == 1) {
-	            W.writeln('Your payoff so far is: ' + win + ' CHF.');
+	            W.writeln('Your payoff so far is: ' + win + ' CHF.',
+                             'extraText');
                 }
                 else {
                     W.writeln('Your total payoff in this game is: ' + win +
-                              ' CHF.');
+                              ' CHF.', 'extraText');
                 }
-                // W.writeln('Your exitcode is: ' + exitcode);
 	    });
-//             if (node.env('part') == 1) {
-//                 // Redirect to game room.
-//                 timer = node.timer.createTimer({
-//                     milliseconds: 10000,
-//                     timeup: function() {
-//                         // Delete player cookie and reconnect to start
-//                         // second part of the experiment.
-//                         node.store.cookie('player', null);
-//                         location.reload();
-//                     }
-//                 });
-//                 timer.start();
-//            }
         });
 
         console.log('Game ended');
