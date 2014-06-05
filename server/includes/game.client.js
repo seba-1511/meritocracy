@@ -126,7 +126,12 @@ module.exports = function(gameRoom, treatmentName, settings) {
         // - state display widget,
         // - iframe of play,
         // - player.css
-        W.setupFrame('PLAYER');
+        // W.setupFrame('PLAYER');
+
+        W.generateHeader();
+        node.game.timer = node.widgets.append('VisualTimer', W.headerElement);
+        W.addCSS(W.getFrameRoot(), '/stylesheets/nodegame.css');
+        W.generateFrame();
 
         node.on('BID_DONE', function(bid, isTimeOut) {
             node.game.timer.stop();

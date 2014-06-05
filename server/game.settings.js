@@ -107,7 +107,7 @@ module.exports = {
         // Logic
         breakPart1: 20000,
         // Waiting Room
-        dispatch: 30000
+        dispatch: 3000
     },
 
     // DEBUG.
