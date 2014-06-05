@@ -293,7 +293,7 @@ module.exports = function(gameRoom, treatmentName, settings) {
                     // It is me?
                     if (barsValues[1][0] === i && barsValues[1][1] === j) {
                         color = [undefined, '#9932CC'];
-                        text += ' YOU <-----';
+                        text += ' YOU <img src="imgs/arrow.jpg" style="height:15px;"/>';
                         myPayoff = +barsValues[2][i][j];
                     }
                     else {
