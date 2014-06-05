@@ -133,6 +133,9 @@ module.exports = function(gameRoom, treatmentName, settings) {
         W.addCSS(W.getFrameRoot(), '/stylesheets/nodegame.css');
         W.generateFrame();
 
+        // Add the disable right click to all frames.
+        W.initLibs(['/meritocracy/js/disable_right.js']);
+
         node.on('BID_DONE', function(bid, isTimeOut) {
             node.game.timer.stop();
             W.getElementById('submitOffer').disabled = 'disabled';
