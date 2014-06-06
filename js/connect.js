@@ -15,6 +15,8 @@ window.onload = function () {
 	// host: http://myserver.com,	  
         verbosity: 10,
         window: {
+            disableRightClick: true,
+            defaultHeaderPosition: 'left',
             promptOnleave: false,
             noEscape: true // Defaults TRUE
         },
