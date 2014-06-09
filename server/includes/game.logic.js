@@ -35,17 +35,17 @@ var counter = 0;
 // Here we export the logic function. Receives three parameters:
 // - node: the NodeGameClient object.
 // - channel: the ServerChannel object in which this logic will be running.
-// - gameRoom: the GameRoom object in which this logic will be running. 
+// - gameRoom: the GameRoom object in which this logic will be running.
 module.exports = function(node, channel, gameRoom, treatmentName, settings) {
 
     var DUMP_DIR, DUMP_DIR_JSON, DUMP_DIR_CSV;
     var ngdb, mdb;
-    
+
     var treatments;
     var dk, confPath;
 
     var client;
-    
+
     var nbRequiredPlayers;
 
     var EXCHANGE_RATE, groupnames;
@@ -53,7 +53,7 @@ module.exports = function(node, channel, gameRoom, treatmentName, settings) {
     // Variable registered outside of the export function are shared among all
     // instances of game logics.
     var counter, channelCode, exPart, uniqueSession;
-    
+
     counter = settings.SESSION_ID;
     channelCode = channel.name.charAt(channel.name.length-1);
     exPart = settings.part;
@@ -61,9 +61,9 @@ module.exports = function(node, channel, gameRoom, treatmentName, settings) {
 
     EXCHANGE_RATE = settings.EXCHANGE_RATE;
     groupNames = settings.GROUP_NAMES;
-    
+
     DUMP_DIR = path.resolve(__dirname, '..', 'data') + '/' + uniqueSession + '/';
-    
+
     J.mkdirSyncRecursive(DUMP_DIR, 0777);
 
     // Preparing storage: FILE or MONGODB.
@@ -76,7 +76,7 @@ module.exports = function(node, channel, gameRoom, treatmentName, settings) {
         J.mkdirSyncRecursive(DUMP_DIR_CSV, 0777);
     }
     else {
-        
+
         ngdb = new Database(node);
         mdb = ngdb.getLayer('MongoDB', {
             dbName: 'meritocracy_db',
@@ -175,7 +175,7 @@ module.exports = function(node, channel, gameRoom, treatmentName, settings) {
         };
     }
 
-    
+
     // Outgoing messages will be saved.
     node.socket.journalOn = true;
 
@@ -184,7 +184,7 @@ module.exports = function(node, channel, gameRoom, treatmentName, settings) {
 
     // Client game to send to reconnecting players.
     client = require(gameRoom.clientPath)(gameRoom, treatmentName, settings);
-    
+
     // Reads in descil-mturk configuration.
     confPath = path.resolve(__dirname, '..', 'descil.conf.js');
     dk = require('descil-mturk')(confPath);
@@ -227,7 +227,7 @@ module.exports = function(node, channel, gameRoom, treatmentName, settings) {
         // from overbooking stage. Ignore them.
         if (nPlayers >= settings.GROUP_SIZE) return false;
         // This is a real disconnection.
-        return nPlayers < settings.GROUP_SIZE;        
+        return nPlayers < settings.GROUP_SIZE;
     }
 
     // Event handler registered in the init function are always valid.
@@ -235,7 +235,7 @@ module.exports = function(node, channel, gameRoom, treatmentName, settings) {
         console.log('********************** meritocracy room ' + counter+++' **********************');
 
         node.game.countdown = null;
-        
+
         // Players that disconnected temporarily.
         node.game.disconnected = {};
         // Players sent away due to overbooking.
@@ -248,7 +248,7 @@ module.exports = function(node, channel, gameRoom, treatmentName, settings) {
             currentStage = node.game.getCurrentGameStage();
 
             if (settings.DB === 'FILE') {
-                // We do not save stage 0.0.0. 
+                // We do not save stage 0.0.0.
                 // Morever, If the last stage is equal to the current one, we are
                 // re-playing the same stage cause of a reconnection. In this
                 // case we do not update the database, or save files.
@@ -257,17 +257,17 @@ module.exports = function(node, channel, gameRoom, treatmentName, settings) {
                 }
                 // Update last stage reference.
                 node.game.lastStage = currentStage;
-                
+
                 db = node.game.memory.stage[currentStage];
-                
+
                 if (db && db.size()) {
                     try {
                         // Saving results to FS.
                         node.fs.saveMemory('csv', DUMP_DIR + 'memory_' + currentStage +
                                            '.csv', { flags: 'w' }, db);
                         node.fs.saveMemory('json', DUMP_DIR + 'memory_' + currentStage +
-                                           '.nddb', null, db);        
-                        
+                                           '.nddb', null, db);
+
                         console.log('Round data saved ', currentStage);
                     }
                     catch(e) {
@@ -276,7 +276,7 @@ module.exports = function(node, channel, gameRoom, treatmentName, settings) {
                     }
                 }
             }
-            
+
             console.log(uniqueSession, ' - Round:  ', currentStage);
         });
 
@@ -288,7 +288,7 @@ module.exports = function(node, channel, gameRoom, treatmentName, settings) {
 
         // Register player disconnection, and wait for him...
         node.on.pdisconnect(function(p) {
-            var curStage;        
+            var curStage;
             curStage = node.game.getCurrentGameStage().stage;
             console.log('Warning: one player disconnected! ', curStage, p.id);
 
@@ -296,14 +296,14 @@ module.exports = function(node, channel, gameRoom, treatmentName, settings) {
                 disconnected: true,
                 stage: p.stage
             });
-               
+
             if (numOfPlayersMatters(curStage, p.id)) {
 
-                // If we do not have other disconnected players, 
+                // If we do not have other disconnected players,
                 // start the procedure.
                 if (node.game.countdown === null) {
-                    node.say('notEnoughPlayers', 'ALL');        
-                    
+                    node.say('notEnoughPlayers', 'ALL');
+
                     this.countdown = setTimeout(function() {
                         var i;
                         console.log('Countdown fired. Player/s did not reconnect.');
@@ -321,19 +321,20 @@ module.exports = function(node, channel, gameRoom, treatmentName, settings) {
                         node.remoteCommand('resume', 'ALL');
                     }, 30000);
                 }
-                
+
                 // Only if the disconnection is not related to players sent away
                 // for overbooking added to the list of temporarily disconnected.
                 if ('undefined' === typeof node.game.overbooked[p.id]) {
                     node.game.disconnected[p.id] = '';
                 }
-            }            
+            }
         });
 
 
         // Reconnections must be handled by the game developer.
         node.on.preconnect(function(p) {
-            var code, curStage, state, i, len;
+            var code, curStage;
+            var state, stateMsgs, i, len;
 
             console.log('Oh...somebody reconnected!', p);
             code = dk.codeExists(p.id);
@@ -354,7 +355,7 @@ module.exports = function(node, channel, gameRoom, treatmentName, settings) {
                 // This could be improved, maybe not throwing the exception.
                 node.game.pl.add(p);
                 node.redirect('html/disconnected.htm', p.id);
-                console.log('game.logic: kicked out player tried to ' + 
+                console.log('game.logic: kicked out player tried to ' +
                             'reconnect: ' + p.id);
                 return;
             }
@@ -364,7 +365,7 @@ module.exports = function(node, channel, gameRoom, treatmentName, settings) {
                 // This could be improved, maybe not throwing the exception.
                 node.game.pl.add(p);
                 node.redirect('html/obco.html?co=1&out=' + code.ExitCode, p.id);
-                console.log('game.logic: checked out player tried to ' + 
+                console.log('game.logic: checked out player tried to ' +
                             'reconnect: ' + p.id);
                 return;
             }
@@ -382,21 +383,30 @@ module.exports = function(node, channel, gameRoom, treatmentName, settings) {
             // Mark code as connected.
             code.disconnected = false;
 
-            
+            // Get the list of messages previously sent to
+            // the reconnecting client in the same stage.
+            // Messages will be re-sent **after** the client
+            // has been initialized. We need to get this messages
+            // before sending any others, otherwise they will be duplicated.
+            state = node.socket.journal.stage[curStage];
+            if (state && state.size()) {
+                stateMsgs = state.selexec('to', '=', p.id).fetch();
+            }
+
             // Clear any message in the buffer from.
             // node.remoteCommand('erase_buffer', 'ALL');
 
             // Notify other player he is back.
             // TODO: add it automatically if we return TRUE? It must be done
             // both in the alias and the real event handler
-            node.game.pl.each(function(player) {                
+            node.game.pl.each(function(player) {
                 node.socket.send(node.msg.create({
                     target: 'PCONNECT',
                     data: p,
                     to: player.id
                 }));
             });
-            
+
             // Send currently connected players to reconnecting.
             node.socket.send(node.msg.create({
                 target: 'PLIST',
@@ -426,23 +436,26 @@ module.exports = function(node, channel, gameRoom, treatmentName, settings) {
             // Do something.
             // Resend state to connected player.
             // node.remoteCommand('goto_step', p.id, curStage);
-            
+
             // Start the game on the reconnecting client.
             node.remoteCommand('start', p.id, {
                 startStage: node.game.plot.previous(curStage)
             });
 
-            state = node.socket.journal.stage[curStage];
-            
-            if (state && state.size()) {
-                state = state.selexec('to', '=', p.id).fetch();
-
-                if (state) {
-                    i = -1, len = state.length;
+            // Re-send missing msessages now.
+            if (stateMsgs) {
+                if (stateMsgs) {
+                    i = -1, len = stateMsgs.length;
                     for ( ; ++i < len ; ) {
-                        node.socket.send(state[i]);
+                        node.socket.send(stateMsgs[i]);
                     }
                 }
+
+                // Test. not nice...
+                // This messages should be deleted from journal, otherwise
+                // they sum up.
+                node.socket.journal.stage[curStage] = state.selexec('to', '!=', p.id);
+
             }
 
             // If all disconnected players reconnected...
@@ -451,7 +464,7 @@ module.exports = function(node, channel, gameRoom, treatmentName, settings) {
                 // Will send all the players to current stage
                 // (also those who were there already).
                 // node.game.gotoStep(node.player.stage);
-            
+
 
                 // Unpause ALL players
                 // TODO: add it automatically if we return TRUE? It must be done
@@ -460,11 +473,11 @@ module.exports = function(node, channel, gameRoom, treatmentName, settings) {
                     if (player.id !== p.id) {
                         node.remoteCommand('resume', player.id);
                     }
-                });                
+                });
             }
             // Check if we care about disconnected players.
             else if (numOfPlayersMatters()) {
-                node.say('notEnoughPlayers', p.id);                
+                node.say('notEnoughPlayers', p.id);
             }
             console.log('init');
         });
@@ -503,7 +516,7 @@ module.exports = function(node, channel, gameRoom, treatmentName, settings) {
         var playerIds;
 
         console.log('endgame');
-        
+
         bonusFile = DUMP_DIR + 'bonus.csv';
 
         console.log('FINAL PAYOFF PER PLAYER');
@@ -521,7 +534,7 @@ module.exports = function(node, channel, gameRoom, treatmentName, settings) {
             exitcode = code.ExitCode;
 
             // Update total real money won.
-            code.winReal = (code.winReal || 0) + 
+            code.winReal = (code.winReal || 0) +
                 parseFloat(Number((code.win || 0) / EXCHANGE_RATE).toFixed(2), 10);
             code.winReal = parseFloat(code.winReal, 10);
 
@@ -544,9 +557,9 @@ module.exports = function(node, channel, gameRoom, treatmentName, settings) {
             node.fs.writeCsv(bonusFile, bonus, {
                 headers: ["access", "exit", "bonus", "terminated"]
             });
-        } 
+        }
         catch(e) {
-            console.log('ERROR: could not save the bonus file: ', 
+            console.log('ERROR: could not save the bonus file: ',
                         DUMP_DIR + 'bonus.csv');
         }
 
@@ -558,14 +571,14 @@ module.exports = function(node, channel, gameRoom, treatmentName, settings) {
                 playerIds = node.game.pl.id.getAllKeys();
                 for (i in playerIds) {
                     if (playerIds.hasOwnProperty(i)) {
-                        channel.movePlayer(playerIds[i], 
+                        channel.movePlayer(playerIds[i],
                                            channel.waitingRoom.name);
                     }
                 }
             }
         }, settings.timer.breakPart1);
         // Destroy Room?
-        
+
     }
 
     // Set default step rule.
@@ -591,32 +604,32 @@ module.exports = function(node, channel, gameRoom, treatmentName, settings) {
             var nPlayers, redirectPlayersDb, extraPlayersCount;
             var ob;
             console.log('overbooking');
-            
+
             // Query string variable for redirection: if 1 it is a normal
             // overbooking, if 0, we had some many disconnections already
             // that the game cannot start at all.
-            ob = 1;            
+            ob = 1;
             nPlayers = node.game.pl.size();
-            if (nPlayers !== settings.GROUP_SIZE && 
+            if (nPlayers !== settings.GROUP_SIZE &&
                 nPlayers !== (settings.GROUP_SIZE - 1)) {
-                
+
                 // We have too many players, some will be redirected away.
                 if (nPlayers > settings.GROUP_SIZE) {
                     extraPlayersCount = nPlayers - settings.GROUP_SIZE;
                     redirectPlayersDb = node.game.pl
                         .shuffle()
-                        .limit(extraPlayersCount);                        
+                        .limit(extraPlayersCount);
                 }
                 // Not enough players. Game suspended.
                 else {
                     redirectPlayersDb = node.game.pl;
                     ob = 0;
                 }
-                
+
                 redirectPlayersDb.each(function(p) {
                     var code, link;
                     code = dk.codeExists(p.id);
-                    link = 'html/obco.html?ob=' + ob + 
+                    link = 'html/obco.html?ob=' + ob +
                         '&out=' + code.ExitCode;
                     dk.checkOut(p.id, code.ExitCode, 0);
                     // Save the id of redirected player.
@@ -625,7 +638,7 @@ module.exports = function(node, channel, gameRoom, treatmentName, settings) {
                     node.redirect(link, p.id);
                 });
             }
-            
+
             if (!ob) {
                 node.game.gameover();
             }

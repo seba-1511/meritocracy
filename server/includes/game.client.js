@@ -72,13 +72,13 @@ module.exports = function(gameRoom, treatmentName, settings) {
         if (node.game.roomType === 'endo') {
             node.game.bidderPage += 'bidder_endo.html';
             node.game.resultsPage += 'results_endo.html';
-            node.game.instructionsPage += 'instructions_endo.html';
+            // node.game.instructionsPage += 'instructions_endo.html';
             node.game.quizPage += 'quiz_endo.html';
         }
         else if (node.game.roomType === 'blackbox') {
             node.game.bidderPage += 'bidder_blackbox.html';
             node.game.resultsPage += 'results_blackbox.html';
-            node.game.instructionsPage += 'instructions_blackbox.html';
+            // node.game.instructionsPage += 'instructions_blackbox.html';
             node.game.quizPage += 'quiz_blackbox.html'
         }
         else {
@@ -87,33 +87,36 @@ module.exports = function(gameRoom, treatmentName, settings) {
             
             if (node.game.part === 1) {
                 if (node.game.roomType === 'random') {
-                    node.game.instructionsPage += 'instructions_random.html';
+                    // node.game.instructionsPage += 'instructions_random.html';
                     node.game.quizPage += 'quiz_random.html'
                 }
                 else if (node.game.roomType === 'exo_perfect') {
-                    node.game.instructionsPage += 'instructions_exo_perfect.html';
+                    // node.game.instructionsPage += 'instructions_exo_perfect.html';
                     node.game.quizPage += 'quiz_exo_perfect.html'
                 }
                 else {
-                    node.game.instructionsPage += 'instructions_exo_lowhigh.html';
-                        node.game.quizPage += 'quiz_exo_lowhigh.html';
+                    // node.game.instructionsPage += 'instructions_exo_lowhigh.html';
+                    node.game.quizPage += 'quiz_exo_lowhigh.html';
                 }     
             }       
             else {
                 if (node.game.roomType === 'random') {
-                    node.game.instructionsPage += 'instructions_random_2.html';
+                    // node.game.instructionsPage += 'instructions_random_2.html';
                     node.game.quizPage += 'quiz_random.html'
                 }
                 else if (node.game.roomType === 'exo_perfect') {
-                    node.game.instructionsPage += 'instructions_exo_perfect_2.html';
+                    // node.game.instructionsPage += 'instructions_exo_perfect_2.html';
                     node.game.quizPage += 'quiz_exo_perfect.html'
                 }
                 else {
-                    node.game.instructionsPage += 'instructions_exo_lowhigh_2.html';
+                    // node.game.instructionsPage += 'instructions_exo_lowhigh_2.html';
                     node.game.quizPage += 'quiz_exo_lowhigh.html';
                 }     
             }
         }
+        
+        // Overwrite instructions page for the Lab
+        node.game.instructionsPage += 'instructions_lab.html';
 
         // Hide the waiting for other players message.
         waitingForPlayers = W.getElementById('waitingForPlayers');

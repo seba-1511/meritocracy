@@ -94,15 +94,15 @@ module.exports = {
         quiz: 120000,
         questionnaire: 180000,
         bid: function() {
-	    if (node.game.getCurrentGameStage().round < 3) return 30000;
+	    if (node.game.getCurrentGameStage().round < 2) return 30000;
 	    return 15000;
 	},
         results: function() {
+            return 25000;
             var round;
             round = node.game.getCurrentGameStage().round;
 	    if (round < 2) return 60000;
-	    if (round < 3) return 50000;
-	    return 30000;
+	    return 25000;
         },
         // Logic
         breakPart1: 20000,
