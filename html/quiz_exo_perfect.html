@@ -14,7 +14,7 @@
         <dd>
           <span id="coinsEveryRound_result" class="quiz_result"></span>
           <form name="coinsEveryRound" id="coinsEveryRound">
-            <p> How many coins do you get every of the 40 rounds ? </p>
+            <p class="question"> How many coins do you get every of the 40 rounds ? </p>
             <p>
               <input type="radio" name="coinsEveryRound" value="20"> 20<br>
               <input type="radio" name="coinsEveryRound" value="10"> 10<br>
@@ -28,7 +28,7 @@
         <dd>
           <span id="lowestPayement_result" class="quiz_result"></span>
           <form name="lowestPayement" id="lowestPayement">
-            <p> If you transfer 5 coins to the group account, how many coins in total in this round are you guaranteed to earn ? </p>
+            <p class="question"> If you transfer 5 coins to the group account, what is the minimum amount of coins that you can win in this round ? </p>
             <p>
               <input type="radio" name="lowestPayement" value="5"> 5<br>
               <input type="radio" name="lowestPayement" value="17.5"> 17.5<br>
@@ -42,7 +42,7 @@
         <dd>
           <span id="leastGuarantee_result" class="quiz_result"></span>
           <form name="leastGuarantee" id="leastGuarantee">
-            <p> If you transfer 5 coins to the group account, and all others do the same, how many coins in total in this round are you guaranteed to earn ? </p>
+            <p class="question"> If you transfer 5 coins to the group account, and all others do the same, what is the minimum amount of coins that you can win in this round ? </p>
             <p>
               <input type="radio" name="leastGuarantee" value="7.5"> 7.5<br>
               <input type="radio" name="leastGuarantee" value="25"> 25<br>
@@ -56,19 +56,17 @@
         <dd>
           <span id="likeliness_result" class="quiz_result"></span>
           <form name="likeliness" id="likeliness">
-            <p> Given the following setup: </p>
+            <p> Given the setup below, what will your position in the ranking be ? </p>
             <table class="table table-striped">
               <thead>
-                <tr><td>Player/s</td><td>Transfer to Group Account</td></tr>              
+                <tr><td>Number of Players</td><td>Transfer to Group Account</td></tr>              
               </thead>
               <tbody>
-                <tr><td>You</td><td>5</td></tr>
-                <tr><td>Other 7 players</td><td>5</td></tr>
-                <tr><td>Other 4 players</td><td>10</td></tr>
-                <tr><td>Other 4 players</td><td>0</td></tr>              
+                <tr><td>4</td><td>0</td></tr>        
+                <tr><td>8 (including you)</td><td>5</td></tr>
+                <tr><td>4</td><td>10</td></tr>      
               </tbody>
             </table>
-            <p> what will your position be in the ranking ? </p>
             <p>
               <input type="radio" name="likeliness" value="anyRank"> I am equally likely to take any rank<br>
               <input type="radio" name="likeliness" value="always"> I will always be ranked between the 5th and 12th positions (all equally likely for me), and never a higher or lower rank<br>

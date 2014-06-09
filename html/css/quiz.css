@@ -21,6 +21,10 @@ div#quiz {
     padding: 10px;
 }
 
+p.question {
+    font-weight: bold;
+}
+
 .quiz_result {
     font-weight: bold;
 }
