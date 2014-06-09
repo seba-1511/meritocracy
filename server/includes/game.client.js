@@ -556,6 +556,8 @@ module.exports = function(gameRoom, treatmentName, settings) {
     function postgame() {
         W.loadFrame('/meritocracy/html/postgame.html', function() {
 
+            W.getElementById('q3' + node.game.part).style.display = '';
+            
             node.env('auto', function() {
 	        node.timer.randomExec(function() {
                     node.game.timer.doTimeUp();
@@ -739,26 +741,32 @@ module.exports = function(gameRoom, treatmentName, settings) {
         cb: postgame,
         timer: settings.timer.questionnaire,
         done: function() {
-            var i, socExpValue, stratChoiceValue;
-            T = W.getFrameDocument(),
+            var T;
+            var errors, i, errDiv, stratCommentErr;
+            var gameName;
+            var stratChoice, stratChoiceValue, stratComment;
+            var q3, q3Value;
+            var comments;
+
+            T = W.getFrameDocument();
+
+            if (node.game.part == 2) {
+                q3 = T.getElementsByName('enjoy-exp');                
+            }
+            else {
+                q3 = T.getElementsByName('played-other-experiment');
+            }
+
             gameName = T.getElementById('game-name').value,
             stratComment = T.getElementById('strategy-comment').value,
-            socExp = T.getElementsByName('played-other-experiment'),
             stratChoice = T.getElementsByName('followed-strategy-choice'),
-            comments = T.getElementById('comment').value;
+            comments = ''; // T.getElementById('comment').value;
 
-            var errors = [], 
+            errors = [], 
             stratCommentErr = false,
             errDiv = null;
 
             // Getting values of form.
-            for (i = 0; i < socExp.length; i++) {
-                if (socExp[i].checked) {
-                    socExpValue = socExp[i].value;
-                    break;
-                }
-            }
-
             for (i = 0; i < stratChoice.length; i++) {
                 if (stratChoice[i].checked) {
                     stratChoiceValue = stratChoice[i].value;
@@ -766,18 +774,21 @@ module.exports = function(gameRoom, treatmentName, settings) {
                 }
             }
 
+            // Q3
+            for (i = 0; i < q3.length; i++) {
+                if (q3[i].checked) {
+                    q3Value = q3[i].value;
+                    break;
+                }
+            }
             // Checking if values are correct.
 
-            if (gameName === '') {
+            if (gameName.trim() === '') {
                 errors.push('1.');
             }
 
-            if ('undefined' === typeof socExpValue) {
-                errors.push('2.');
-            }
-            
             if ('undefined' === typeof stratChoiceValue) {
-                errors.push('3.');
+                errors.push('2.');
             }
 
             if (stratChoiceValue === 'other') {
@@ -787,6 +798,10 @@ module.exports = function(gameRoom, treatmentName, settings) {
                 }
             }
 
+            if ('undefined' === typeof q3Value) {
+                errors.push('3.');
+            }
+            
             isTimeUp = node.game.timer.gameTimer.timeLeft <= 0;
 
             if (errors.length && !isTimeUp) {
@@ -803,22 +818,29 @@ module.exports = function(gameRoom, treatmentName, settings) {
                 return false;
             }
 
-            console.log({
-                gameName: gameName,
-                socExp: socExpValue,
-                stratChoice: stratChoiceValue,
-                comments: comments,
-                stratComment: stratComment
-            });
+            if (node.game.part == 2) {
+                // Sending values to server.
+                node.set('questionnaire', {
+                    gameName: gameName,
+                    socExp: q3Value,
+                    enjoy: 'NA',
+                    stratChoice: stratChoiceValue,
+                    comments: comments,
+                    stratComment: stratComment            
+                });
+            }
+            else {
+                 // Sending values to server.
+                node.set('questionnaire', {
+                    gameName: gameName,
+                    socExp: 'NA',
+                    enjoy: q3Value,
+                    stratChoice: stratChoiceValue,
+                    comments: comments,
+                    stratComment: stratComment            
+                });
+            }
 
-            // Sending values to server.
-            node.set('questionnaire', {
-                gameName: gameName,
-                socExp: socExpValue,
-                stratChoice: stratChoiceValue,
-                comments: comments,
-                stratComment: stratComment            
-            });
             
             node.emit('INPUT_DISABLE');        
             node.set('timestep', {

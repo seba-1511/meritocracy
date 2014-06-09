@@ -92,16 +92,16 @@ module.exports = {
         instructions1: 300000,
         instructions2: 180000,
         quiz: 120000,
-        questionnaire: 180000,
+        questionnaire: 120000,
         bid: function() {
-	    if (node.game.getCurrentGameStage().round < 2) return 30000;
+	    if (node.game.part == 1 &&
+                node.game.getCurrentGameStage().round < 2) return 30000;
 	    return 15000;
 	},
         results: function() {
-            return 25000;
             var round;
             round = node.game.getCurrentGameStage().round;
-	    if (round < 2) return 60000;
+	    if (round < 2) return 50000;
 	    return 25000;
         },
         // Logic
@@ -114,7 +114,7 @@ module.exports = {
     DEBUG: true,
 
     // AUTO-PLAY.
-    AUTO: false,
+    AUTO: true,
 
     // DATABASE.
     DB: 'MONGODB', // FILE, MONGODB

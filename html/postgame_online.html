@@ -26,8 +26,13 @@
     <h1> Please fill in the questionnaire</h1>
     <p>You must answer all the questions marked with *. to complete the task.</p> 
     <div>
-      <h4>* 1. Give a name to the game you have just played.</h4>
+      <h4>* 1. Choose a name for the game you have just played.</h4>
       <input type="text" name="game-name" id="game-name" size="50" /><br>
+    </div>
+    <div>
+      <h4>* 2. Have you participated in other social experiments before ?</h4>
+      <input type="radio" name="played-other-experiment" value="0" /> No<br>
+      <input type="radio" name="played-other-experiment" value="1" /> Yes<br>
     </div>
     <div>
       <h4>* 2. Describe the strategy you played: </h4>
@@ -38,16 +43,10 @@
       <input type="radio" name="followed-strategy-choice" value="other" /> Other (please describe)<br>
       <textarea rows="10" cols="60" id="strategy-comment"></textarea>
     </div>
-    <div id="q31" style="display: none">
-      <h4>* 3. Have you participated in other social experiments before ?</h4>
-      <input type="radio" name="played-other-experiment" value="0" /> No<br>
-      <input type="radio" name="played-other-experiment" value="1" /> Yes<br>
-    </div>
-    <div id="q32" style="display: none">
-      <h4>* 3. Which part of the experiment did you enjoy more ?</h4>
-      <input type="radio" name="enjoy-exp" value="1" /> Part 1<br>
-      <input type="radio" name="enjoy-exp" value="2" /> Part 2<br>
-      <input type="radio" name="enjoy-exp" value="0" /> Both were equally enjoyable / dislikable <br>
+    <div>
+      <h4>4. Free text. Please describe to a friend the game you have played. Please mention if you noticed any technical flaw, or irregular behavior from other players</h4>
+      <textarea rows="10" cols="60" id="comment"></textarea>
+      
     </div>
     <div id="divErrors"></div>
     <button id="comment_done" onclick='javascript:parent.node.done();' class="btn btn-lg btn-primary" >Click here when you are done</button>
