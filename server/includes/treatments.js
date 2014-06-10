@@ -386,7 +386,8 @@ function finalizeRound(currentStage, bars,
                 console.log('AAAH code not found: ', pId);
             }
             code.win = !code.win ? playerPayoff : code.win + playerPayoff;
-	    console.log('Added to ' + pId + ' ' + playerPayoff + ' ECU');
+	    console.log('Added to ' + pId + ' ' + playerPayoff + ' ECU', code.win);
+
             // End Update.
 
             if (settings.DB === 'MONGODB') {

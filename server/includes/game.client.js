@@ -571,11 +571,11 @@ module.exports = function(gameRoom, treatmentName, settings) {
             W.getElementById('q3' + node.game.part).style.display = '';
             W.getElementById('game_part').innerHTML = node.game.part;
             
-//            node.env('auto', function() {
-//	        node.timer.randomExec(function() {
-//                    node.game.timer.doTimeUp();
-//                });
-//	    });
+            node.env('auto', function() {
+	        node.timer.randomExec(function() {
+                    node.game.timer.doTimeUp();
+                });
+	    });
             
         });
         console.log('Postgame');

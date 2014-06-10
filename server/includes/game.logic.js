@@ -530,8 +530,8 @@ module.exports = function(node, channel, gameRoom, treatmentName, settings) {
             exitcode = code.ExitCode;
 
             // Update total real money won.
-            code.winReal = (code.winReal || 0) +
-                parseFloat(Number((code.win || 0) / EXCHANGE_RATE).toFixed(2), 10);
+            code.winReal = parseFloat(Number((code.win || 0) / EXCHANGE_RATE)
+                                      .toFixed(2), 10);
             code.winReal = parseFloat(code.winReal, 10);
 
             console.log(p.id, ': ',  code.winReal, code.ExitCode);
