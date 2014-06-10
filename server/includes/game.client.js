@@ -569,12 +569,13 @@ module.exports = function(gameRoom, treatmentName, settings) {
         W.loadFrame('/meritocracy/html/postgame.html', function() {
 
             W.getElementById('q3' + node.game.part).style.display = '';
+            W.getElementById('game_part').innerHTML = node.game.part;
             
-            node.env('auto', function() {
-	        node.timer.randomExec(function() {
-                    node.game.timer.doTimeUp();
-                });
-	    });
+//            node.env('auto', function() {
+//	        node.timer.randomExec(function() {
+//                    node.game.timer.doTimeUp();
+//                });
+//	    });
             
         });
         console.log('Postgame');
@@ -754,16 +755,16 @@ module.exports = function(gameRoom, treatmentName, settings) {
         timer: settings.timer.questionnaire,
         done: function() {
             var T;
-            var errors, i, errDiv, stratCommentErr;
+            var errors, i, errDiv, stratCommentErr, enjoyCommentErr;
             var gameName;
             var stratChoice, stratChoiceValue, stratComment;
-            var q3, q3Value;
+            var q3, q3Value, q3Comment;
             var comments;
 
             T = W.getFrameDocument();
 
             if (node.game.part == 2) {
-                q3 = T.getElementsByName('enjoy-exp');                
+                q3 = T.getElementsByName('enjoy-exp');         
             }
             else {
                 q3 = T.getElementsByName('played-other-experiment');
@@ -772,7 +773,9 @@ module.exports = function(gameRoom, treatmentName, settings) {
             gameName = T.getElementById('game-name').value,
             stratComment = T.getElementById('strategy-comment').value,
             stratChoice = T.getElementsByName('followed-strategy-choice'),
+            q3Comment = '';
             comments = ''; // T.getElementById('comment').value;
+            
 
             errors = [], 
             stratCommentErr = false,
@@ -805,7 +808,7 @@ module.exports = function(gameRoom, treatmentName, settings) {
 
             if (stratChoiceValue === 'other') {
                 if (stratComment.length < 5) {
-                    errors.push('3.');
+                    errors.push('2.');
                     stratCommentErr = true;
                 }
             }
@@ -813,7 +816,14 @@ module.exports = function(gameRoom, treatmentName, settings) {
             if ('undefined' === typeof q3Value) {
                 errors.push('3.');
             }
-            
+            else if (node.game.part == 2) {
+                q3Comment = T.getElementById('enjoy-comment').value;
+                if (q3Value !== "0" && q3Comment.trim().length < 3) {
+                    errors.push('3.');
+                    enjoyCommentErr = true;
+                }
+            }
+
             isTimeUp = node.game.timer.gameTimer.timeLeft <= 0;
 
             if (errors.length && !isTimeUp) {
@@ -823,9 +833,12 @@ module.exports = function(gameRoom, treatmentName, settings) {
                      's ' + errors.join(' ')) + '</p>';
 
                 if (stratCommentErr) {
+                    errors += '<p>Answer 2. is too short.</p>';
+                }
+                if (enjoyCommentErr) {
                     errors += '<p>Answer 3. is too short.</p>';
                 }
-
+                
                 errDiv.innerHTML = errors;
                 return false;
             }
@@ -834,22 +847,24 @@ module.exports = function(gameRoom, treatmentName, settings) {
                 // Sending values to server.
                 node.set('questionnaire', {
                     gameName: gameName,
-                    socExp: q3Value,
-                    enjoy: 'NA',
                     stratChoice: stratChoiceValue,
-                    comments: comments,
-                    stratComment: stratComment            
+                    stratComment: stratComment,
+                    socExp: 'NA',                    
+                    enjoy: q3Value,
+                    enjoyComment: q3Comment,                    
+                    comments: comments
                 });
             }
             else {
                  // Sending values to server.
                 node.set('questionnaire', {
                     gameName: gameName,
-                    socExp: 'NA',
-                    enjoy: q3Value,
-                    stratChoice: stratChoiceValue,
-                    comments: comments,
-                    stratComment: stratComment            
+                    stratChoice: stratChoiceValue,                    
+                    stratComment: stratComment,
+                    socExp: q3Value,
+                    enjoy: 'NA',
+                    enjoyComment: 'NA',
+                    comments: comments
                 });
             }
 

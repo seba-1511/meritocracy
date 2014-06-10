@@ -26,7 +26,7 @@
     <h1> Please fill in the questionnaire</h1>
     <p>You must answer all the questions marked with *. to complete the task.</p> 
     <div>
-      <h4>* 1. Give a name to the game you have just played.</h4>
+      <h4>* 1. Choose a name for Part <span id="game_part"></span> of the experiment.</h4>
       <input type="text" name="game-name" id="game-name" size="50" /><br>
     </div>
     <div>
@@ -35,7 +35,7 @@
       <input type="radio" name="followed-strategy-choice" value="random" /> Randomly chose numbers<br>
       <input type="radio" name="followed-strategy-choice" value="egoist" /> Maximized my own personal payoff<br>
       <input type="radio" name="followed-strategy-choice" value="team" /> Maximized group payoff<br>
-      <input type="radio" name="followed-strategy-choice" value="other" /> Other (please describe)<br>
+      <input type="radio" name="followed-strategy-choice" value="other" /> Other (please describe shortly)<br>
       <textarea rows="10" cols="60" id="strategy-comment"></textarea>
     </div>
     <div id="q31" style="display: none">
@@ -44,10 +44,11 @@
       <input type="radio" name="played-other-experiment" value="1" /> Yes<br>
     </div>
     <div id="q32" style="display: none">
-      <h4>* 3. Which part of the experiment did you enjoy more ?</h4>
+      <h4>* 3. Which part of the experiment did you like more ? Please explain why.</h4>      
+      <input type="radio" name="enjoy-exp" value="0" /> Both equally likable / dislikable <br>
       <input type="radio" name="enjoy-exp" value="1" /> Part 1<br>
       <input type="radio" name="enjoy-exp" value="2" /> Part 2<br>
-      <input type="radio" name="enjoy-exp" value="0" /> Both were equally enjoyable / dislikable <br>
+      <textarea rows="10" cols="60" id="enjoy-comment"></textarea>
     </div>
     <div id="divErrors"></div>
     <button id="comment_done" onclick='javascript:parent.node.done();' class="btn btn-lg btn-primary" >Click here when you are done</button>

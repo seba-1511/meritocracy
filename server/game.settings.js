@@ -99,13 +99,14 @@ module.exports = {
 	    return 15000;
 	},
         results: function() {
+            return 25000;
             var round;
             round = node.game.getCurrentGameStage().round;
 	    if (round < 2) return 30000;
 	    return 25000;
         },
         // Logic
-        breakPart1: 20000,
+        breakPart1: 10000,
         // Waiting Room
         dispatch: 3000
     },

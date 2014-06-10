@@ -1,6 +1,7 @@
 window.onload = function () {
     var pc = JSUS.getQueryString('n');
-    
+    var room = JSUS.getQueryString('room');
+
     if (!pc || pc < 2 || pc > 40) {
   	alert('Oopps! Something went wrong. Please contact the experimenter.');
   	throw new Error('No PC number found.');
@@ -34,8 +35,17 @@ window.onload = function () {
 	}
     });
 
-    // Connecting to waiting room.
-    if (pc < 18) {        
+    // Connecting to waiting room:
+    // if a room is specified in query string use that info.
+    // Otherwise use pc number.
+
+    if (room && room === 'A') {
+        node.connect("/meritocracy");
+    }
+    else if (room && room === 'B') {
+        node.connect("/meritocracyB");
+    }
+    else if (pc < 18) {        
         node.connect("/meritocracy");
     }
     else {
