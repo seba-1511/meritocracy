@@ -95,13 +95,13 @@ module.exports = {
         questionnaire: 120000,
         bid: function() {
 	    if (node.game.part == 1 &&
-                node.game.getCurrentGameStage().round < 2) return 30000;
+                node.game.getCurrentGameStage().round < 3) return 30000;
 	    return 15000;
 	},
         results: function() {
             var round;
             round = node.game.getCurrentGameStage().round;
-	    if (round < 2) return 50000;
+	    if (round < 2) return 30000;
 	    return 25000;
         },
         // Logic

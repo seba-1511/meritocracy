@@ -508,14 +508,10 @@ module.exports = function(node, channel, gameRoom, treatmentName, settings) {
 
     function questionnaire() {
         console.log('questionnaire');
-    }
 
-    function endgame() {
         var code, exitcode, accesscode;
         var bonusFile, bonus;
         var playerIds;
-
-        console.log('endgame');
 
         bonusFile = DUMP_DIR + 'bonus.csv';
 
@@ -538,20 +534,11 @@ module.exports = function(node, channel, gameRoom, treatmentName, settings) {
                 parseFloat(Number((code.win || 0) / EXCHANGE_RATE).toFixed(2), 10);
             code.winReal = parseFloat(code.winReal, 10);
 
-            // We don't need to check them out here.
-            // dk.checkOut(accesscode, exitcode, code.win);
-
-	    node.say('WIN', p.id, {
-                win: code.winReal.toFixed(2),
-                exitcode: code.ExitCode
-            });
-
             console.log(p.id, ': ',  code.winReal, code.ExitCode);
             return [p.id, code.ExitCode, code.winReal, node.game.gameTerminated];
         });
 
         console.log('***********************');
-        console.log('Game ended');
 
         try {
             node.fs.writeCsv(bonusFile, bonus, {
@@ -562,6 +549,31 @@ module.exports = function(node, channel, gameRoom, treatmentName, settings) {
             console.log('ERROR: could not save the bonus file: ',
                         DUMP_DIR + 'bonus.csv');
         }
+    }
+
+    function endgame() {
+        var code, exitcode, accesscode;
+        var playerIds;
+
+        console.log('endgame');
+
+        node.game.pl.each(function(p) {
+            // debugger
+            code = dk.codes.id.get(p.id);
+            if (!code) {
+                console.log('ERROR: no code in endgame:', p.id);
+                return ['NA', 'NA'];
+            }
+
+            accesscode = code.AccessCode;
+            exitcode = code.ExitCode;
+
+	    node.say('WIN', p.id, {
+                win: code.winReal.toFixed(2),
+                exitcode: code.ExitCode
+            });
+        });
+
 
         setTimeout(function() {
             // Notify Waiting Room that first part is finished.
