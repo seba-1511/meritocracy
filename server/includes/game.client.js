@@ -503,12 +503,18 @@ module.exports = function(gameRoom, treatmentName, settings) {
             var toHide, i;
             var b, options, other;
             var treatment;
-            var roundCount;
-            
-            // Update the total if that changes.
-            roundCount = node.player.stage.round + ' / 40';
+            var round;
 
-            W.getElementById('round_count').innerHTML = roundCount;
+            round = node.player.stage.round;
+
+            // Update the total if that changes.
+            W.getElementById('round_count').innerHTML = round + ' / 40';
+            if (round === 1) {
+                W.getElementById('attention_1').style.display = '';
+            }
+            else {
+                W.getElementById('attention_any').style.display = '';
+            }
 
             treatment = node.env('roomType');
 
