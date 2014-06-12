@@ -600,7 +600,8 @@ module.exports = function(gameRoom, treatmentName, settings) {
                              'extraText');
                 }
                 else {
-                    W.writeln('Your total payoff in this game is: ' + win +
+                    W.writeln('Your total payoff in the experiment ' + 
+                              '(Part 1 + Part 2) is: ' + win +
                               ' CHF.', 'extraText');
                 }
 	    });

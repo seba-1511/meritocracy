@@ -84,7 +84,7 @@ module.exports = function(node, channel, gameRoom, treatmentName, settings) {
         });
 
         mdb.connect(function() {});
-
+        
         node.on.data('questionnaire', function(msg) {
             var saveObject = {
                 session: uniqueSession,
@@ -93,12 +93,15 @@ module.exports = function(node, channel, gameRoom, treatmentName, settings) {
                 player: msg.from,
                 created: msg.created,
                 gameName: msg.data.gameName,
-                additionalComments: msg.data.comments,
-                alreadyParticipated: msg.data.socExp,
                 strategyChoice: msg.data.stratChoice,
-                strategyComments: msg.data.stratComment,
+                strategyComments: msg.data.stratComment,                
+                alreadyParticipated: msg.data.socExp,
+                enjoy: msg.data.enjoy,
+                enjoyComment: msg.data.enjoyComment,
+                additionalComments: msg.data.comments,                
                 exPart: exPart
             };
+
             mdb.store(saveObject);
         });
 
