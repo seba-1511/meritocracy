@@ -3,7 +3,7 @@
  * Copyright(c) 2014 Stefano Balietti
  * MIT Licensed
  *
- * Shows current, previous and next state.
+ * Shows list of rooms in a channel.
  *
  * www.nodegame.org
  * ---
@@ -33,58 +33,28 @@
     };
 
     function renderCell(o) {
-        var content;
-        var text, textElem;
+        var elem;
 
-        content = o.content;
-        textElem = document.createElement('span');
-        if ('object' === typeof content) {
-            switch (o.x) {
-            case 0:
-                text = content.name;
-                break;
+        if (o.y === 0) {
+            //elem = document.createElement('span');
+            //elem.innerHTML =
+            //    '<a class="ng_clickable">' + o.content.name + '</a>';
 
-            case 1:
-                text = content.id;
-                break;
+            //elem.onclick = function() {
+            //    // Signal the ClientList to switch rooms:
+            //    node.emit('USEROOM', {
+            //        id: o.content.id,
+            //        name: o.content.name
+            //    });
+            //};
 
-            case 2:
-                text = '' + content.nClients;
-                break;
-            
-            case 3:
-                text = '' + content.nPlayers;
-                break;
-            
-            case 4:
-                text = '' + content.nAdmins;
-                break;
-
-            default:
-                text = 'N/A';
-                break;
-            }
-
-            if (o.x === 0) {
-                textElem.innerHTML = '<a class="ng_clickable">' + text + '</a>';
-
-                textElem.onclick = function() {
-                    // Signal the ClientList to switch rooms:
-                    node.emit('USEROOM', {
-                        id: content.id,
-                        name: content.name
-                    });
-                };
-            }
-            else {
-                textElem.innerHTML = text;
-            }
+            elem = document.createTextNode(o.content.name);
         }
         else {
-            textElem = document.createTextNode(content);
+            elem = document.createTextNode(o.content);
         }
 
-        return textElem;
+        return elem;
     }
 
     function RoomList(options) {
@@ -101,6 +71,8 @@
         // Create header:
         this.table.setHeader(['Name', 'ID',
                               'Clients', 'Players', 'Admins']);
+
+        this.waitingForServer = false;
     }
 
     RoomList.prototype.setChannel = function(channelName) {
@@ -111,6 +83,7 @@
         if ('string' !== typeof this.channelName) return;
 
         // Ask server for room list:
+        this.waitingForServer = true;
         node.socket.send(node.msg.create({
             target: 'SERVERCOMMAND',
             text:   'INFO',
@@ -140,12 +113,16 @@
 
         // Listen for server reply:
         node.on.data('INFO_ROOMS', function(msg) {
-            // Update the contents:
-            that.writeRooms(msg.data);
-            that.updateTitle();
+            if (that.waitingForServer) {
+                that.waitingForServer = false;
 
-            // Show the panel:
-            that.panelDiv.style.display = '';
+                // Update the contents:
+                that.writeRooms(msg.data);
+                that.updateTitle();
+
+                // Show the panel:
+                that.panelDiv.style.display = '';
+            }
         });
 
         // Listen for events from ChannelList saying to switch channels:
@@ -168,7 +145,9 @@
                 roomObj = rooms[roomName];
 
                 this.table.addRow(
-                        [roomObj, roomObj, roomObj, roomObj, roomObj]);
+                        [{id: roomObj.id, name: roomObj.name}, roomObj.id,
+                         '' + roomObj.nClients, '' + roomObj.nPlayers,
+                         '' + roomObj.nAdmins]);
             }
         }
 

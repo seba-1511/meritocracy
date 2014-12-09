@@ -3,7 +3,7 @@
  * Copyright(c) 2014 Stefano Balietti
  * MIT Licensed
  *
- * Shows current, previous and next state.
+ * Shows list of channels on the server.
  *
  * www.nodegame.org
  * ---
@@ -34,54 +34,25 @@
 
     function renderCell(o) {
         var content;
-        var text, textElem;
+        var textElem;
 
         content = o.content;
-        if ('object' === typeof content) {
-            switch (o.x) {
-            case 0:
-                text = content.name;
-                break;
+        textElem = document.createElement('span');
 
-            case 1:
-                text = '' + content.nGameRooms;
-                break;
-
-            case 2:
-                text = content.nConnClients +
-                       ' (+' + content.nDisconnClients + ')';
-                break;
-
-            case 3:
-                text = content.nConnPlayers +
-                       ' (+' + content.nDisconnPlayers + ')';
-                break;
-
-            case 4:
-                text = content.nConnAdmins +
-                       ' (+' + content.nDisconnAdmins + ')';
-                break;
-            }
-
-            textElem = document.createElement('span');
-
-            if (o.x === 0) {
-                textElem.innerHTML = '<a class="ng_clickable">' + text + '</a>';
-                textElem.onclick = function() {
-                    // Signal the RoomList to switch channels:
-                    node.emit('USECHANNEL', content.name);
-                };
-            }
-            else {
-                textElem.innerHTML = text;
-            }
-
-            if (o.x >= 2) {  // number of clients/players/admins
-                textElem.title = 'Connected (+ Disconnected)';
-            }
+        if (o.y === 0) {
+            textElem.innerHTML =
+                '<a class="ng_clickable">' + content + '</a>';
+            textElem.onclick = function() {
+                // Signal the RoomList to switch channels:
+                node.emit('USECHANNEL', content);
+            };
         }
         else {
-            textElem = document.createTextNode(content);
+            textElem.innerHTML = content;
+        }
+
+        if (o.y >= 2) {  // number of clients/players/admins
+            textElem.title = 'Connected (+ Disconnected)';
         }
 
         return textElem;
@@ -100,10 +71,13 @@
         // Create header:
         this.table.setHeader(['Name', 'Rooms',
                               'Clients', 'Players', 'Admins']);
+
+        this.waitingForServer = false;
     }
 
     ChannelList.prototype.refresh = function() {
         // Ask server for channel list:
+        this.waitingForServer = true;
         node.socket.send(node.msg.create({
             target: 'SERVERCOMMAND',
             text:   'INFO',
@@ -130,7 +104,10 @@
 
         // Listen for server reply:
         node.on.data('INFO_CHANNELS', function(msg) {
-            that.writeChannels(msg.data);
+            if (that.waitingForServer) {
+                that.waitingForServer = false;
+                that.writeChannels(msg.data);
+            }
         });
     };
 
@@ -145,7 +122,10 @@
                 chanObj = channels[chanKey];
 
                 this.table.addRow(
-                        [chanObj, chanObj, chanObj, chanObj, chanObj]);
+                 [chanObj.name, '' + chanObj.nGameRooms,
+                  chanObj.nConnClients + ' (+' + chanObj.nDisconnClients + ')',
+                  chanObj.nConnPlayers + ' (+' + chanObj.nDisconnPlayers + ')',
+                  chanObj.nConnAdmins + ' (+' + chanObj.nDisconnAdmins + ')']);
             }
         }
 

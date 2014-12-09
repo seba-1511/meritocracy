@@ -22,7 +22,7 @@
     GameList.version = '0.1.0';
     GameList.description = 'Visually display available games on the server.';
 
-    GameList.title = 'Games';
+    //GameList.title = 'Games';
     GameList.className = 'gamelist';
 
     // ## Dependencies
@@ -38,7 +38,7 @@
 
         content = o.content;
         if ('object' === typeof content) {
-            switch (o.x) {
+            switch (o.y) {
             case 0:
                 text = content.info.name;
                 break;

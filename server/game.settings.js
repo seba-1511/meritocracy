@@ -98,7 +98,7 @@ module.exports = {
                 node.game.getCurrentGameStage().round < 3) return 30000;
 	    return 15000;
 	},
-        results: function() {
+        results: function(){ 
             return 25000;
             var round;
             round = node.game.getCurrentGameStage().round;
@@ -115,7 +115,7 @@ module.exports = {
     DEBUG: true,
 
     // AUTO-PLAY.
-    AUTO: true,
+    AUTO: false,
 
     // DATABASE.
     DB: 'MONGODB', // FILE, MONGODB

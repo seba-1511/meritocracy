@@ -3,8 +3,8 @@ function Monitor(node) {
     var stager = new node.Stager();
 
     stager.setOnInit(function() {
-        var button;
-        var channelList, roomList, clientList;
+        var button, tabList, tmpElem;
+        var tabContent, channelList, roomList, clientList;
 
         // Add refresh button:
         button = document.createElement('button');
@@ -17,11 +17,53 @@ function Monitor(node) {
         };
         document.body.appendChild(button);
 
+        // Tabs:
+        tabList = document.createElement('ul');
+        tabList.className = 'nav nav-tabs';
+        tabList.setAttribute('role', 'tablist');
+        document.body.appendChild(tabList);
+
+        tmpElem = document.createElement('li');
+        tmpElem.className = 'active';
+        tmpElem.innerHTML =
+            '<a href="#channels" role="tab" data-toggle="tab">Channels</a>';
+        tabList.appendChild(tmpElem);
+
+        tmpElem = document.createElement('li');
+        tmpElem.innerHTML =
+            '<a href="#clients" role="tab" data-toggle="tab">Clients</a>';
+        tabList.appendChild(tmpElem);
+
+        tmpElem = document.createElement('li');
+        tmpElem.innerHTML =
+            '<a href="#games" role="tab" data-toggle="tab">Games</a>';
+        tabList.appendChild(tmpElem);
+
         // Add widgets:
-        channelList = node.widgets.append('ChannelList');
-        roomList    = node.widgets.append('RoomList');
-        clientList  = node.widgets.append('ClientList');
-        gameList    = node.widgets.append('GameList');
+        tabContent = document.createElement('div');
+        tabContent.className = 'tab-content';
+        document.body.appendChild(tabContent);
+
+        // Channel and room list:
+        tmpElem = document.createElement('div');
+        tmpElem.className = 'tab-pane active';
+        tmpElem.id = 'channels';
+        tabContent.appendChild(tmpElem);
+        channelList = node.widgets.append('ChannelList', tmpElem);
+        roomList = node.widgets.append('RoomList', tmpElem);
+
+        // Client list and controls:
+        tmpElem = document.createElement('div');
+        tmpElem.className = 'tab-pane';
+        tmpElem.id = 'clients';
+        tabContent.appendChild(tmpElem);
+        clientList = node.widgets.append('ClientList', tmpElem);
+
+        tmpElem = document.createElement('div');
+        tmpElem.className = 'tab-pane';
+        tmpElem.id = 'games';
+        tabContent.appendChild(tmpElem);
+        node.widgets.append('GameList', tmpElem);
     });
 
     stager.addStage({
