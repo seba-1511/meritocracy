@@ -475,7 +475,7 @@ module.exports = function(node, channel, room) {
 
                 // Doing the random matching.
                 tmpPlayerList = wRoom.shuffle().limit(totalGroupSize);
-                debugger
+
                 //Assigning a game room to this list of players
                 assignedRoom = decideRoom(settings.CHOSEN_TREATMENT);
                 runtimeConf.roomType = assignedRoom.name;
@@ -489,11 +489,14 @@ module.exports = function(node, channel, room) {
                 //
                 // The constructor also moves the client from this room into
                 // the new room
+
+
                 gameRoom = channel.createGameRoom({
                     gameName: 'meritocracy',
                     group: assignedRoom.name,
                     clients: tmpPlayerList,
-                    runtimeConf: runtimeConf
+                    runtimeConf: runtimeConf,
+                    treatmentName: assignedRoom.name
                 });
 
 
@@ -511,9 +514,12 @@ module.exports = function(node, channel, room) {
 //                     });
 //                 });
 
-
+                
                 // Start the logic.
-                gameRoom.startGame();
+                gameRoom.setupGame();
+                gameRoom.startGame(true, []);
+
+                // gameRoom.startGame();
             }
 
             if ('undefined' !== TARGET_SESSIONS) {

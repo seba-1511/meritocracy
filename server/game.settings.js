@@ -10,8 +10,10 @@ module.exports = {
 
     // Files:
 
-    logicPath: "includes/game.logic.js",
-    clientPath: "includes/game.client.js",
+    gamePaths: {
+        logic: "includes/game.logic.js",
+        player: "includes/game.client.js",
+    },
 
     // Waiting Room Settings. *
     ////////////////////////////
@@ -31,9 +33,9 @@ module.exports = {
     COUNTDOWN_AT_POOL_SIZE: undefined,
 
     // How many players have to connect before a random subset is drawn.
-    POOL_SIZE: 4,
+    POOL_SIZE: 16,
     // How many players in each group ( must be <= POOL_SIZE).
-    GROUP_SIZE: 4,
+    GROUP_SIZE: 16,
     // How many extra players besides those in GROUP_SIZE will be added.
     GROUP_OVERBOOKING: 0,
 
@@ -89,9 +91,9 @@ module.exports = {
     COMPENSATION: 0.25,
 
     timer: {
-        instructions1: 300000,
-        instructions2: 180000,
-        quiz: 120000,
+        instructions1: 1000, // 300000,
+        instructions2: 1000, // 180000,
+        quiz: 1000, // 120000,
         questionnaire: 120000,
         bid: function() {
 	    if (node.game.part == 1 &&
@@ -118,10 +120,10 @@ module.exports = {
     AUTO: false,
 
     // DATABASE.
-    DB: 'MONGODB', // FILE, MONGODB
+    DB: 'FILE', // FILE, MONGODB
 
     // AUTHORIZATION.
-    AUTH: 'LOCAL', // MTURK, LOCAL, NO.
+    AUTH: 'NO', // MTURK, LOCAL, NO.
 
 
     treatments: {

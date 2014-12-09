@@ -59,8 +59,9 @@ module.exports = function(gameRoom, treatmentName, settings) {
             throw new Error('Missconfigured Game: missing roomType.');
         }
         if (!node.game.part) {
-            alert('Missconfigured Game: missing part.');
-            throw new Error('Missconfigured Game: missing part.');
+            // TODO: put in again.
+            //alert('Missconfigured Game: missing part.');
+            //throw new Error('Missconfigured Game: missing part.');
         }
 
         // Adapting the game to the treatment.

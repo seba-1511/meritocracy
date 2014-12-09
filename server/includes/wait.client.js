@@ -24,7 +24,7 @@ function waiting2start() {
     span_dots = document.getElementById('span_dots');
     span_msg = document.getElementById('span_msg');
     // span_atleast = document.getElementById('span_atleast');
-    
+
     // Refreshing the dots...
     setInterval(function() {
         if (span_dots.innerHTML !== '......') {

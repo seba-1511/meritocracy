@@ -186,7 +186,7 @@ module.exports = function(node, channel, gameRoom, treatmentName, settings) {
     nbRequiredPlayers = settings.MIN_PLAYERS;
 
     // Client game to send to reconnecting players.
-    client = require(gameRoom.clientPath)(gameRoom, treatmentName, settings);
+    client = require(__dirname + '/game.client')(gameRoom, treatmentName, settings);
 
     // Reads in descil-mturk configuration.
     confPath = path.resolve(__dirname, '..', 'descil.conf.js');
@@ -684,6 +684,7 @@ module.exports = function(node, channel, gameRoom, treatmentName, settings) {
         cb: function() {
             // Computes the values for all players and all groups,
             // sends them to the clients, and save results into database.
+            debugger
             treatments[treatmentName].sendResults();
             return true;
         },
