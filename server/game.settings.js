@@ -63,7 +63,7 @@ module.exports = {
     CHOSEN_TREATMENT: 'LAB',
 
     // How many times the meritocracy stage is repeated. *
-    REPEAT: 2,
+    REPEAT: 4,
     // Names of the groups.
     GROUP_NAMES: ['1', '2', '3', '4'],
     // How many player in each group. *
@@ -91,9 +91,9 @@ module.exports = {
     COMPENSATION: 0.25,
 
     timer: {
-        instructions1: 1000, // 300000,
-        instructions2: 1000, // 180000,
-        quiz: 1000, // 120000,
+        instructions1: 30000, // 300000,
+        instructions2: 30000, // 180000,
+        quiz: 120000,
         questionnaire: 120000,
         bid: function() {
 	    if (node.game.part == 1 &&
